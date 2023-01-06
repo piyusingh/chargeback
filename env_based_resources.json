@@ -1,0 +1,20 @@
+{
+	"application": {
+		"repo_name": "chargeback",
+		"owner": "piyusingh",
+		"branch": "main",
+		"connection_arn": "arn:aws:codestar-connections:us-east-1:187879053795:connection/60ede194-bb55-4ca9-af8f-2013c782a9bb"
+	},
+	"Dev": {
+		"env": {
+			"account": "187879053795",
+			"region": "us-east-1"
+		},
+		"common_stack_info": {
+			"vpc_id": "vpc-0b6cc59f63615a4d7",
+			"availability_zones": ["us-east-1a"],
+			"private_subnet_ids": ["subnet-020e218e8416f1bf8"],
+			"security_group_id": "sg-0e45c1fe1cee2050f"
+		}
+	}
+}
