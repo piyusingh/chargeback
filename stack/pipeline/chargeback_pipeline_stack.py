@@ -5,8 +5,7 @@ from aws_cdk import aws_codepipeline as codepipeline
 from aws_cdk import aws_codepipeline_actions as codepipeline_actions
 from aws_cdk import (aws_ec2 as ec2_,aws_lambda,aws_iam as iam_,aws_s3 as s3)
 from stack.stack_stage.configuration import  RawConfig
-#from stack.stack_stage.application_stage import MVRExternalizationStacks
-#from stack.stack_stage.data_stage import MVRExternalizationDataStack
+from stack.stack_stage.application_stage import ChargebackStacks
 
 
 
@@ -49,7 +48,15 @@ class ChargebackPipelineStack(cdk.Stack):
         code_build_environment =codebuild.BuildEnvironment(build_image=codebuild.LinuxBuildImage.STANDARD_5_0, 
                                                             compute_type=codebuild.ComputeType.SMALL, 
                                                             privileged = True)
-
+        application_deploy = codebuild.PipelineProject(self, 'ChargebackDeployment',
+                                                          project_name="Chargeback-Deployment",
+                                                          vpc=vpc,
+                                                          security_groups=[security_group],
+                                                          environment=code_build_environment,
+                                                          timeout=cdk.Duration.hours(2),
+                                                          build_spec=codebuild.BuildSpec.from_source_filename(
+                                                              "stack/pipeline/buildspec/pipeline_deploy_buildspec.yaml")
+                                                        )
         #Pipeline_update
         pipeline_update = codebuild.PipelineProject(
                                                     self,
@@ -83,8 +90,6 @@ class ChargebackPipelineStack(cdk.Stack):
         statement.add_actions("states:*")
         statement.add_actions("dynamodb:*")
         statement.add_resources("*")
-        # dev_application_deploy.add_to_role_policy(statement)
-        # prod_application_deploy.add_to_role_policy(statement)
         pipeline_update.add_to_role_policy(statement)
         
         #Pipeline definition
@@ -114,3 +119,16 @@ class ChargebackPipelineStack(cdk.Stack):
                                             input=source_output
                                         )
                                 ])
+        # Deployment stage
+        pipeline.add_stage(
+            stage_name="Deployment",
+            actions=[
+                codepipeline_actions.CodeBuildAction(
+                    action_name="Application_Deployment",
+                    project=application_deploy,
+                    input=source_output,
+                )
+            ]
+        )
+        app_env = cdk.Environment(**self._raw_config.development.env)
+        app = ChargebackStacks(self,id = "development", env=app_env, raw_config=self._raw_config.development)

@@ -15,6 +15,15 @@
 			"availability_zones": ["us-east-1a"],
 			"private_subnet_ids": ["subnet-020e218e8416f1bf8"],
 			"security_group_id": "sg-0e45c1fe1cee2050f"
+		},
+		"lambda_env_vars" : 
+		{
+			"lambda_timeouts": 29,
+			"lambda_memory": 256,
+		"decider_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-Decider"
 		}
+	}
 	}
 }
