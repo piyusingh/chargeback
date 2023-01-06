@@ -6,6 +6,7 @@ phases:
       python: 3.9
     commands:
       - export PROJ_LOC=$(pwd)
+      - pip install -r requirements.txt
       - npm -g i aws-cdk-lib
       - npm -g update
   build:
