@@ -92,6 +92,7 @@ class ChargebackPipelineStack(cdk.Stack):
         statement.add_actions("sts:AssumeRole")
         statement.add_resources("*")
         pipeline_update.add_to_role_policy(statement)
+        application_deploy.add_to_role_policy(statement)
         
         #Pipeline definition
         pipeline = codepipeline.Pipeline(self, pipeline_name,
