@@ -89,6 +89,7 @@ class ChargebackPipelineStack(cdk.Stack):
         statement.add_actions("lambda:*")
         statement.add_actions("states:*")
         statement.add_actions("dynamodb:*")
+        statement.add_actions("sts:AssumeRole")
         statement.add_resources("*")
         pipeline_update.add_to_role_policy(statement)
         
