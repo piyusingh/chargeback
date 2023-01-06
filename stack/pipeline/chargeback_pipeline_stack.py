@@ -15,7 +15,7 @@ class ChargebackPipelineStack(cdk.Stack):
         super().__init__(scope, id, **kwargs)
         self._raw_config = raw_config
         source_output = codepipeline.Artifact()
-        pipeline_name='Chargeback-Serverless-Pipeline'
+        pipeline_name='Chargeback-Pipeline'
         
         #Github details
         connection_arn = self._raw_config.application['connection_arn']
