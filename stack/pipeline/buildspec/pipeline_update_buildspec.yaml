@@ -6,12 +6,8 @@ phases:
       python: 3.9
     commands:
       - export PROJ_LOC=$(pwd)
-      - sh scripts/setup-self-signed-certs.sh -a
-      - sh scripts/setup-npm-repository.sh
       - npm -g i aws-cdk-lib
       - npm -g update
-      - sh scripts/setup-pypi-repository.sh
-      - sh scripts/install.sh                                                      
   build:
     commands:
       - npx cdk deploy ChargebackPipelineStack --require-approval never
