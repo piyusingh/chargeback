@@ -16,6 +16,15 @@
 			"private_subnet_ids": ["subnet-020e218e8416f1bf8"],
 			"security_group_id": "sg-0e45c1fe1cee2050f"
 		},
+		"apigateway_info": {
+			"cert_arn": "arn:aws:acm:us-east-1:187879053795:certificate/8b7ed190-4542-4ed9-8796-62633b8d5945",
+			"domain_name": "www.chargeback.com",
+			"rate_limit": 100,
+			"burst_limit": 200,
+			"throttling_burst_limit": 10000,
+			"throttling_rate_limit": 5000,
+			"stage_name": "dev"
+		},
 		"lambda_env_vars" : 
 		{
 			"lambda_timeouts": 29,
@@ -23,6 +32,27 @@
 		"decider_lambda_vars": {
 			"LOG_LEVEL": "INFO",
 			"SERVICE": "Chargeback-Decider"
+		},
+		"triggerStateMachine_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-TriggerStateMachine",
+			"AUDIT_LOGGER_TABLE": "Chargeback-Audit",
+			"STATE_MACHINE_ARN": "arn:aws:states:us-east-1:187879053795:stateMachine:Chargeback-StateMachine"
+		},
+		"prepareDataSaveToDynamoDB_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-PrepareDataSaveToDynamoDB"
+		},
+		"prepareDataRetrieveFromDynamoDB_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-PrepareDataRetrieveFromDynamoDB"
+		},
+		"saveAndRetrieveFromDynamoDB_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-SaveAndRetrieveFromDynamoDB",
+			"AUDIT_LOGGER_TABLE": "Chargeback-Audit",
+			"CHARGEBACK_COST_TABLE": "Chargeback-Cost",
+			"CHARGEBACK_TABLE": "Chargeback"
 		}
 	}
 	}
