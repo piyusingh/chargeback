@@ -28,7 +28,7 @@ class SaveAndRetrieveFromDynamoDBLambdaStack(cdk.Stack):
         self.saveAndRetrieveFromDynamoDB = lambda_.Function(self, "Chargeback_saveandretrievefromdynamodb",
                                         code=lambda_.Code.from_asset('lambdas/saveAndRetrieveFromDynamoDB'),
                                         function_name='Chargeback-SaveAndRetrieveFromDynamoDB',
-                                        handler='Chargeback_PrepareDataSaveToDynamoDB.lambda_handler',
+                                        handler='Chargeback_SaveAndRetrieveFromDynamoDB.lambda_handler',
                                         vpc=self.Vpc,
                                         security_groups=[self.Security_Group],
                                         tracing=lambda_.Tracing.ACTIVE,
