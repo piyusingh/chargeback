@@ -17,7 +17,7 @@
 			"security_group_id": "sg-0e45c1fe1cee2050f"
 		},
 		"apigateway_info": {
-			"cert_arn": "arn:aws:acm:us-east-1:187879053795:certificate/8b7ed190-4542-4ed9-8796-62633b8d5945",
+			"cert_arn": "arn:aws:acm:us-east-1:187879053795:certificate/6b6ce702-c70b-4064-ad94-2360b01957dc",
 			"domain_name": "www.chargeback.com",
 			"rate_limit": 100,
 			"burst_limit": 200,
@@ -53,7 +53,21 @@
 			"AUDIT_LOGGER_TABLE": "Chargeback-Audit",
 			"CHARGEBACK_COST_TABLE": "Chargeback-Cost",
 			"CHARGEBACK_TABLE": "Chargeback"
+		},
+		"streamDataToS3_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-StreamDataToS3",
+			"AUDIT_LOGGER_TABLE": "Chargeback-Audit",
+			"S3_BUCKET": "chargebackinsurance"
+		}
+	},
+	"dynamo_db_env_vars":{
+			"dynamodb_table_name": "Chargeback",
+			"dynamodb_table_arn": "arn:aws:dynamodb:us-east-1:187879053795:table/Chargeback"
+	},
+		"dynamodb_stream_event_batch_parameters": {
+			"batch_size": 1,
+			"retry_attempts": -1
 		}
 	}
 	}
-}

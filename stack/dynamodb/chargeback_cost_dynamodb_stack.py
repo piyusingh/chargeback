@@ -13,11 +13,11 @@ class ChargebackCostDynamodbStack(cdk.Stack):
             self,"Chargeback-Cost",
             table_name = "Chargeback-Cost",
             partition_key = DynamoDB.Attribute(
-                name ="PK",
+                name ="BaseState",
                 type= DynamoDB.AttributeType.STRING
             ),
             sort_key = DynamoDB.Attribute(
-                name="SK",
+                name="ReportType",
                 type= DynamoDB.AttributeType.STRING
 
             ),

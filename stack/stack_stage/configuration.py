@@ -9,6 +9,8 @@ class EnvSpecific:
         self.env = d["env"]
         self.common_stack_info = d["common_stack_info"]
         self.lambda_env_vars = d["lambda_env_vars"]
+        self.dynamo_db_env_vars = d["dynamo_db_env_vars"]
+        self.dynamodb_stream_event_batch_parameters = d["dynamodb_stream_event_batch_parameters"]
         
 class RawConfig:
     """
