@@ -50,3 +50,8 @@ class DeciderLambdaStack(cdk.Stack):
 
         ## Assignment of role to decider Lambda
         self.decider.add_to_role_policy(decider_statement)
+
+         ##Exporting lambda arn
+        lambda_arn_export = cdk.CfnOutput(self,"chargeback_decider_export",
+                                               value = self.decider.function_arn,
+                                               export_name = "chargeback-decider-export")

@@ -49,3 +49,9 @@ class SaveAndRetrieveFromDynamoDBLambdaStack(cdk.Stack):
 
         ## Assignment of role to SaveAndRetrieveFromDynamoDBLambda
         self.saveAndRetrieveFromDynamoDB.add_to_role_policy(saveAndRetrieveFromDynamoDB_statement)
+
+         ##Exporting lambda arn
+        lambda_arn_export = cdk.CfnOutput(self,"chargeback_saveAndRetrieveFromDynamoDB_export",
+                                               value = self.saveAndRetrieveFromDynamoDB.function_arn,
+                                               export_name = "chargeback-saveAndRetrieveFromDynamoDB-export"
+                                               )

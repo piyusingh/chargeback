@@ -38,3 +38,8 @@ class PrepareDataSaveToDynamoDBLambdaStack(cdk.Stack):
                                         layers=[common_stack.aws_lambda_common_layer],
                                         memory_size =raw_config.lambda_env_vars["lambda_memory"],
                                         )
+         ##Exporting lambda arn
+        lambda_arn_export = cdk.CfnOutput(self,"chargeback_prepareDataSaveToDynamoDB_export",
+                                               value = self.prepareDataSaveToDynamoDB.function_arn,
+                                               export_name = "chargeback-prepareDataSaveToDynamoDB-export"
+                                               )

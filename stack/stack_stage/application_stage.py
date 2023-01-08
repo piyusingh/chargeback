@@ -15,6 +15,7 @@ from stack.dynamodb.chargeback_dynamodb_stack import ChargebackDynamodbStack
 from stack.certificateManager.certificateManager import CertificateManagerStack
 from stack.lambda_functions.streamDataToS3_lambda_stack import StreamDataToS3LambdaStack
 from stack.s3.chargeback_s3_stack import ChargebackS3Stack
+from stack.step_functions.chargeback_step_functions_stack import ChargebackStepFunctionsStack
 
 
 # Adding lambda
@@ -34,6 +35,7 @@ class ChargebackStacks(cdk.Stage):
     chargebackauditloggerdynamodbstack = ChargebackAuditLoggerDynamodbStack( self,'ChargebackAuditLoggerDynamoDB')
     chargebackcertificatemanagerstack = CertificateManagerStack( self,'CertificateManager')
     chargebacks3stack = ChargebackS3Stack( self,'S3')
+    chargeback_step_functions = ChargebackStepFunctionsStack( self,'ChargebackStepFunctionsStack',raw_config=raw_config)
 
 
    
