@@ -11,6 +11,7 @@ class EnvSpecific:
         self.lambda_env_vars = d["lambda_env_vars"]
         self.dynamo_db_env_vars = d["dynamo_db_env_vars"]
         self.dynamodb_stream_event_batch_parameters = d["dynamodb_stream_event_batch_parameters"]
+        self.apigateway_info = d["apigateway_info"]
         
 class RawConfig:
     """

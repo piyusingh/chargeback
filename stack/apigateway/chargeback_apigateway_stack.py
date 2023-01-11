@@ -1,6 +1,5 @@
 import json
 from aws_cdk.aws_kms import Key
-import jsonschema
 from aws_cdk import (
                      aws_lambda as lambda_,
                      aws_apigateway as apigw,

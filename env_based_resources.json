@@ -17,8 +17,6 @@
 			"security_group_id": "sg-0e45c1fe1cee2050f"
 		},
 		"apigateway_info": {
-			"cert_arn": "arn:aws:acm:us-east-1:187879053795:certificate/6b6ce702-c70b-4064-ad94-2360b01957dc",
-			"domain_name": "www.chargeback.com",
 			"rate_limit": 100,
 			"burst_limit": 200,
 			"throttling_burst_limit": 10000,
