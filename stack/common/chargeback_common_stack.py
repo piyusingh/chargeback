@@ -22,10 +22,10 @@ class ChargebackCommonStack(cdk.Stack):
         common_python_runtime = lambda_.Runtime.PYTHON_3_7
 
         #Common layer
-        self.aws_lambda_common_layer = lambda_.LayerVersion(
+        self.aws_lambda_layer = lambda_.LayerVersion(
             self,
-            "Chargeback_aws_lambda_common_layer",
-            layer_version_name="Chargeback_AWS_Lambda_Common_Layer",
+            "Chargeback_aws_lambda_layer",
+            layer_version_name="Chargeback_AWS_Lambda_Layer",
             description="AWS powertools,Boto,Pandas,Pyarrow",
             code=lambda_.Code.from_asset("lambdas/layers/chargeback_layer"),
             compatible_runtimes=[common_python_runtime],

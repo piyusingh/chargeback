@@ -35,7 +35,7 @@ class PrepareDataSaveToDynamoDBLambdaStack(cdk.Stack):
                                         runtime=lambda_.Runtime.PYTHON_3_7,
                                         timeout=cdk.Duration.seconds(raw_config.lambda_env_vars["lambda_timeouts"]),
                                         environment=raw_config.lambda_env_vars["prepareDataSaveToDynamoDB_lambda_vars"],
-                                        layers=[common_stack.aws_lambda_common_layer],
+                                        layers=[common_stack.aws_lambda_layer],
                                         memory_size =raw_config.lambda_env_vars["lambda_memory"],
                                         )
          ##Exporting lambda arn
