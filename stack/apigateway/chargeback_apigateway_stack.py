@@ -27,10 +27,7 @@ class ChargebackApigatewayStack(cdk.Stack):
                                         deploy_options=apigw.StageOptions(
                                             stage_name=raw_config.apigateway_info["stage_name"],
                                             throttling_burst_limit=raw_config.apigateway_info["throttling_burst_limit"],
-                                            throttling_rate_limit=raw_config.apigateway_info["throttling_rate_limit"],
-                                            data_trace_enabled = True,
-                                            logging_level  = apigw.MethodLoggingLevel.INFO,
-                                            tracing_enabled = True,
+                                            throttling_rate_limit=raw_config.apigateway_info["throttling_rate_limit"]
                                         ))
 
         violations ={
