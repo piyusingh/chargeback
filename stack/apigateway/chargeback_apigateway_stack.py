@@ -18,7 +18,7 @@ class ChargebackApigatewayStack(cdk.Stack):
         super().__init__(scope,construct_id, **kwargs)
         
         #Importing lambdas       
-        import_trigger_lambda_arn = cdk.Fn.import_value(shared_value_to_import="Chargeback_triggerStateMachine_export")      
+        import_trigger_lambda_arn = cdk.Fn.import_value(shared_value_to_import="Chargeback-triggerStateMachine-export")      
         triggerStateMachine=lambda_.Function.from_function_arn(self,"Chargeback_TriggerStateMachine_Import",
                                                                 function_arn =import_trigger_lambda_arn)
         self.target_api = apigw.RestApi(self,'Chargeback',
