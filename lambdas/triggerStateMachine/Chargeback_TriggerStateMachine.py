@@ -1,4 +1,3 @@
-
 import boto3
 import json
 import os
@@ -50,7 +49,7 @@ def lambda_handler(event, context):
             correlation_id = event['headers']['x-correlation-id']
         else:
             correlation_id = context.aws_request_id
-        if(event['resource']=="/getchargeback"):
+        if(event['resource']=="/getChargeback"):
             request_payload= json.loads(event['body'])
             quote_id= request_payload['quoteID']
             report_type = request_payload['chargeback']['reportType']
@@ -58,7 +57,7 @@ def lambda_handler(event, context):
             body = event['body']
             source = "APIGateway"
            
-        elif(event['resource']=="/savechargeback"):
+        elif(event['resource']=="/saveChargeback"):
             request_payload= json.loads(event['body'])
             quote_id=request_payload['chargeback']['quoteID']
             report_type = request_payload['chargeback']['reportType']
@@ -93,7 +92,7 @@ def lambda_handler(event, context):
             })
         }
         try:
-            if(resource=='/savechargeback' or resource=='savechargeback'):
+            if(resource=='/saveChargeback'):
                 audit_table= dynamoDB_client.Table(audit_logger_table)
                 payload_for_audit_table={}
                 payload_for_audit_table['PK']=f'{report_type}#Failure'
@@ -138,7 +137,7 @@ def lambda_handler(event, context):
             })
         }
         try:
-            if(resource=='/savechargeback' or resource=='savechargeback'):
+            if(resource=='/saveChargeback'):
                 audit_table= dynamoDB_client.Table(audit_logger_table)
                 payload_for_audit_table={}
                 payload_for_audit_table['PK']=f'{report_type}#Failure'
@@ -157,20 +156,8 @@ def lambda_handler(event, context):
         return response
 
     try:
-        if (source == "AppSync"):
-            if(resource == "/savechargeback"):
-                api_response = json.loads(de_response['output'])
-                end_time = time.perf_counter()
-                logger.info('Successful Event : %s : %s : Duration : %s seconds', lambda_function_name, function_name, end_time - start_time)
-                return json.dumps(api_response['body'])
-            elif(resource== "/getchargeback"):
-                api_response = json.loads(de_response['output'])
-                end_time = time.perf_counter()
-                logger.info('Successful Event : %s : %s : Duration : %s seconds', lambda_function_name, function_name, end_time - start_time)
-                return api_response['body']
-        else:
-            response = json.loads(de_response['output'])
-            api_response = {
+        response = json.loads(de_response['output'])
+        api_response = {
             "statusCode" : response['statusCode'],
             "body":json.dumps(response['body'])
             }
@@ -192,7 +179,7 @@ def lambda_handler(event, context):
             })
         }
         try:
-            if(resource=='/savechargeback' or resource=='savechargeback'):
+            if(resource=='/saveChargeback'):
                 audit_table= dynamoDB_client.Table(audit_logger_table)
                 payload_for_audit_table={}
                 payload_for_audit_table['PK']=f'{report_type}#Failure'
