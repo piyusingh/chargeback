@@ -22,8 +22,8 @@ phases:
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackDynamoDB --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackAuditLoggerDynamoDB --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ReadingFromDynamoDBStreams --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/ReadingFromKinesis --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/Kinesis --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ReadingFromKinesis --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/S3 --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackStepFunctionsStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackApigatewayStack --require-approval never
