@@ -69,6 +69,27 @@
 			"SERVICE": "Chargeback-StreamDataToS3",
 			"AUDIT_LOGGER_TABLE": "Chargeback-Audit",
 			"S3_BUCKET": "chargebackinsurance"
+		},
+		"transactionReport_lambda_vars": {
+			"SERVICE": "Chargeback-TransactionReport",
+			"S3_BUCKET": "chargebackinsurance"
+		},
+		"expenseReport_lambda_vars": {
+			"SERVICE": "Chargeback-ExpenseReport",
+			"S3_BUCKET": "chargebackinsurance"
+		},
+		"reportCSV_lambda_vars": {
+			"SERVICE": "Chargeback-ReportCSV",
+			"S3_BUCKET": "chargebackinsurance"
+		},
+		"reportTriggerStateMachine_lambda_vars": {
+			"SERVICE": "Chargeback-ReportTriggerStateMachine",
+			"STATE_MACHINE_ARN": "arn:aws:states:us-east-1:187879053795:stateMachine:ChargebackReportStateMachine"
+		},
+		"aggregateReport_lambda_vars": {
+			"SERVICE": "Chargeback-ReportCSV",
+			"S3_BUCKET": "chargebackinsurance",
+			"AMOUNT_CRITERIA": "50"
 		}
 	},
 	"dynamo_db_env_vars":{

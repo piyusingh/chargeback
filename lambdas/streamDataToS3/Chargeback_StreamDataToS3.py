@@ -131,7 +131,7 @@ def put_record_to_S3(event,new_image):
 	payload= json.loads(payload)
 	quote_id= event_payload['chargeback']['quoteID']
 	quote_id_report = event_payload['chargeback']['quoteID'] + '#' + reportType
-	if(new_image['PK']['S']== quote_id_report and payload['chargeback']['shallOrderFlag']== True and 'firstOrderDate' in payload['chargeback'] and payload['chargeback']['firstOrderDate']!= '' and payload['chargeback']['chargeUpdatedFlag']== Tr):
+	if(new_image['PK']['S']== quote_id_report and payload['chargeback']['shallOrderFlag']== True and 'firstOrderDate' in payload['chargeback'] and payload['chargeback']['firstOrderDate']!= '' and payload['chargeback']['chargeUpdatedFlag']== True):
 		s3_parquet(event, new_image, payload)
 
 	try:

@@ -14,18 +14,24 @@ phases:
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackCommonStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/DeciderLambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/TriggerStateMachineLambdaStack --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/PrepareDataRetrieveFromDynamoDB --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/PrepareDataSaveToDynamoDB --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/SaveAndRetrieveFromDynamoDB --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/StreamDataToS3 --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/PrepareDataRetrieveFromDynamoDBLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/PrepareDataSaveToDynamoDBLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/SaveAndRetrieveFromDynamoDBLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ReportCSVLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ReportTriggerStateMachineLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/TransactionReportLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/AggregateReportLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ExpenseReportLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/StreamDataToS3LambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackCostDynamoDB --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackDynamoDB --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackAuditLoggerDynamoDB --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/ReadingFromDynamoDBStreams --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ReadingFromDynamoDBStreamsLambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/Kinesis --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/ReadingFromKinesis --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ReadingFromKinesisLambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/S3 --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/ChargebackStepFunctionsStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ChargebackStepFunctionStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ChargebackReportStepFunctionStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackApigatewayStack --require-approval never
 
        

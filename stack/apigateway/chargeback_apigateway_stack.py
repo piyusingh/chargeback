@@ -21,6 +21,9 @@ class ChargebackApigatewayStack(cdk.Stack):
         import_trigger_lambda_arn = cdk.Fn.import_value(shared_value_to_import="Chargeback-triggerStateMachine-export")      
         triggerStateMachine=lambda_.Function.from_function_arn(self,"Chargeback_TriggerStateMachine_Import",
                                                                 function_arn =import_trigger_lambda_arn)
+        import_reporttrigger_lambda_arn = cdk.Fn.import_value(shared_value_to_import="Chargeback-reportTriggerStateMachine-export")      
+        reportTriggerStateMachine=lambda_.Function.from_function_arn(self,"Chargeback_ReportTriggerStateMachine_Import",
+                                                                function_arn = import_reporttrigger_lambda_arn)
         self.target_api = apigw.RestApi(self,'Chargeback',
                                         rest_api_name='Chargeback',
                                         endpoint_types=[apigw.EndpointType.REGIONAL],
@@ -304,6 +307,30 @@ class ChargebackApigatewayStack(cdk.Stack):
                             api_key_required=True
                             )
         
+        #Create a resource named "getReport" on the base API
+        getReport = self.target_api.root.add_resource('getReport')
+        # Create API Integration for getReport
+        getReport_lambda_integration = apigw.LambdaIntegration(reportTriggerStateMachine,proxy=True, integration_responses=
+                                                     [
+                                                         {
+                                                             'statusCode': '200',
+                                                         }
+                                                     ]
+                                                    )
+        method_getReport = getReport.add_method('GET', getReport_lambda_integration,
+                            request_parameters={
+                                        'method.request.querystring.start_date':True,
+                                        'method.request.querystring.end_date':True,
+                                        'method.request.querystring.report_type':True},
+                            method_responses= [
+                                {
+                                    'statusCode': '200'
+                                }
+                            ],
+                            request_validator= ReqValidator,
+                            api_key_required=True
+                            )
+
         ##Adding lambda resource polices
         trigger_lambda_getChargeback_resource_policy = lambda_.CfnPermission(self,
 										"trigger_lambda_getChargeback_resource_policy",
@@ -321,4 +348,13 @@ class ChargebackApigatewayStack(cdk.Stack):
                                         function_name = triggerStateMachine.function_name,
 										source_arn  = self.target_api.arn_for_execute_api(method = "POST",
 																						path = "/saveChargeback",
+																						stage = self.target_api.deployment_stage.stage_name))
+        
+        trigger_lambda_getReport_resource_policy = lambda_.CfnPermission(self,
+										"trigger_lambda_getReport_resource_policy",
+										principal = "apigateway.amazonaws.com",
+										action = "lambda:InvokeFunction",
+                                        function_name = reportTriggerStateMachine.function_name,
+										source_arn  = self.target_api.arn_for_execute_api(method = "GET",
+																						path = "/getReport",
 																						stage = self.target_api.deployment_stage.stage_name))
