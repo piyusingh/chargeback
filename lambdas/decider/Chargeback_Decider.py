@@ -8,12 +8,10 @@ from aws_lambda_powertools import Logger
 
 # Global Variables
 sf_client = boto3.client('stepfunctions')
-
 class chargebackException(Exception):
     pass
 
 ## Beginning of lambda execution
-
 def lambda_handler(event, context):
     lambda_function_name = ''
     function_name =  'lambda_handler'
@@ -24,16 +22,16 @@ def lambda_handler(event, context):
     logger = Logger(service=lambda_name)
     logger.setLevel(log_level)
    
-       
     try:
         start_time = time.perf_counter()
         resource = event['resource']
         payload = json.loads(event['body'])
         source = event['source']
         correlation_id=event['correlation_id']
-        if(resource=="/getchargeback"):
+        if(resource=="/getChargeback"):
             quote_id=payload['quoteID']
-            logger.append_keys(x_correlation_id=correlation_id, quoteID=quote_id)
+            report_Type = payload['reportType']
+            logger.append_keys(x_correlation_id=correlation_id, quoteID=quote_id, reportType=report_Type)
             logger.info('getchargeback :%s',lambda_name)
             get_chargeback_request ={
             'path': resource,
@@ -73,14 +71,16 @@ def lambda_handler(event, context):
         raise chargebackException(response)
    
    
-##   Request for Step Function {'PK' : 251288, 'detail-type' : '/getchargeback'}
+##   Request for Step Function {'PK' : 251288, 'detail-type' : '/getChargeback'}
 def get_chargeback(get_chargeback_request):
     quote_id = get_chargeback_request['requestbody']['quoteID']  ## The partition key for retrieving the details of violation from dynamo DB
+    report_Type = get_chargeback_request['requestbody']['reportType']
     resource = get_chargeback_request['path']  ## This is to identify which route in Step Function should be invoked
     source = get_chargeback_request['source']
     correlation_id=get_chargeback_request['correlation_id']
     input_to_step_function = {
         'quoteID': quote_id,
+        'reportType': report_Type,
         'resource': resource,
         'source' : source,
         'correlation_id' : correlation_id

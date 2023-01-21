@@ -22,7 +22,7 @@ error_payload_audit_table={}
 dynamoDB_client = boto3.resource('dynamodb')
 lambda_name = os.environ['SERVICE']
 log_level = os.environ['LOG_LEVEL']
-audit_logger_table=os.environ['audit_logger_table']
+audit_logger_table=os.environ['AUDIT_LOGGER_TABLE']
 logger = Logger(service=lambda_name)
 logger.setLevel(log_level)
 s3_bucket=os.environ['S3_BUCKET']
@@ -85,13 +85,13 @@ def put_record_to_S3(event,new_image):
 	producer_total_charge=0
 	producer_code_charge=0
 	current_request_charge=0
-	cost_per_mvr=0
+	cost_per_report=0
+	reportType = ''
 	transaction_total_charge=0
 	eastern = timezone('US/Eastern')## US/Eastern
 	loc_dt = datetime.now(eastern)
 	date_time = loc_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
 	create_dttime = date_time
-	print('newimage',new_image)
 	if 'M' in new_image['payload'].keys():
 		mapdata = new_image['payload']['M']
 		final_mapdata = from_dynamodb_to_json(mapdata)
@@ -102,9 +102,12 @@ def put_record_to_S3(event,new_image):
 	if 'totalCharge' in new_image:
 		transaction_total_charge= new_image['totalCharge']['N']
 		event_payload['chargeback']['totalCharge']= float(transaction_total_charge)
-	if 'costPerMVR' in new_image:
-		cost_per_mvr=new_image['costPerMVR']['N']
-		event_payload['chargeback']['costPerMVR']= cost_per_mvr
+	if 'costPerReport' in new_image:
+		cost_per_report=new_image['costPerReport']['N']
+		event_payload['chargeback']['costPerReport']= cost_per_report
+	if 'ReportType' in new_image:
+		reportType=new_image['ReportType']['S']
+		event_payload['chargeback']['reportType']= reportType
 	if 'chargeUpdatedFlag' in new_image:
 		event_payload['chargeback']['chargeUpdatedFlag']= new_image['chargeUpdatedFlag']['BOOL']
 	if('firstOrderDate' in event_payload['chargeback'] and event_payload['chargeback']['firstOrderDate']!=''):
@@ -127,8 +130,8 @@ def put_record_to_S3(event,new_image):
 	payload = json.dumps(event_payload, default=handle_decimal_type)
 	payload= json.loads(payload)
 	quote_id= event_payload['chargeback']['quoteID']
-	if(new_image['PK']['S']== event_payload['chargeback']['quoteID'] and payload['chargeback']['shallOrderFlag']== True and 'firstOrderDate' in payload['chargeback'] and payload['chargeback']['firstOrderDate']!= '' and payload['chargeback']['chargeUpdatedFlag']== False):
-		logger.info(payload)
+	quote_id_report = event_payload['chargeback']['quoteID'] + '#' + reportType
+	if(new_image['PK']['S']== quote_id_report and payload['chargeback']['shallOrderFlag']== True and 'firstOrderDate' in payload['chargeback'] and payload['chargeback']['firstOrderDate']!= '' and payload['chargeback']['chargeUpdatedFlag']== Tr):
 		s3_parquet(event, new_image, payload)
 
 	try:
@@ -146,7 +149,6 @@ def put_record_to_S3(event,new_image):
 		logger.error(': %s : Error occurred while putting data in Audit Table for QuoteID:  %s , Exception : %s', function_name,quote_id,ex)
 
 def s3_parquet(event, new_image, payload):
-	print('s3newimage',new_image)
 	report_parquet ={}
 	eastern = timezone('US/Eastern')## US/Eastern
 	loc_dt = datetime.now(eastern)

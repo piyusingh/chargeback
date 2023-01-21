@@ -42,7 +42,7 @@ def lambda_handler(event, context):
         log_event_details(event, context)
     
         ## Flow for Retrieve Chargeback
-        if event['resource'] == "/savechargeback":
+        if event['resource'] == "/saveChargeback":
             return save_chargeback(event, chargeback_table, audit_logger_table)
 
         ## Flow for Get Chargeback
@@ -59,9 +59,9 @@ def get_chargeback(event, chargeback_table):
         if "quoteID" in event:
             logger.info(f'{lambda_name}: {function_name} : Creating payload for Get Chargeback operation')
             quote_id = check_property_exist(event, 'quoteID')
-            source = check_property_exist(event, 'source')
+            report_type = check_property_exist(event, 'reportType')
             logger.info(f'{lambda_name}: {function_name} : Successfully created payload for retrieval from DynamoDB')
-            response_from_dynamo_db = retrieve_from_dynamo_db(quote_id, source, chargeback_table)
+            response_from_dynamo_db = retrieve_from_dynamo_db(quote_id, report_type, chargeback_table)
             logger.debug(f'{lambda_name}: {function_name} : response_from_dynamo_db : {response_from_dynamo_db}')
             end_time = time.perf_counter()
             logger.info(f'{lambda_name}: {function_name} : Duration : {end_time - start_time} seconds')
@@ -96,17 +96,13 @@ def save_chargeback(event, chargeback_table, audit_logger_table):
         dynamodb_insert = request_payload(event)
         payload = event['payload']
         producer_code = payload['chargeback']['producerCode']
-
         report_type = payload['chargeback']['reportType']
-
         if payload['chargeback']['policyIssued']:
             waived = 'Y'
         else:
             waived = 'N'
-
-
         partition_key = payload['chargeback']['quoteID']
-        dynamodb_insert['PK'] = partition_key
+        dynamodb_insert['PK'] = partition_key + '#' + report_type
         dynamodb_insert['SK'] = current_time + '#' + 'v0' + '#' + 'ProducerCode' + '#' + producer_code + '#' + report_type
         dynamodb_insert['payload'] = payload
         dynamodb_insert['Waived'] = waived
@@ -115,9 +111,10 @@ def save_chargeback(event, chargeback_table, audit_logger_table):
         if payload['chargeback']['shallOrderFlag']== False:
             dynamodb_insert['chargeUpdatedFlag'] = True
         quote_id = event['payload']['chargeback']['quoteID']
+        report_type = event['payload']['chargeback']['reportType']
         logger.info(f'{lambda_name}: {function_name}: Successfully created payload for insertion to Dynamo DB')
         
-        response = insert_data_dynamo(dynamodb_insert, chargeback_table, quote_id, current_time, event,
+        response = insert_data_dynamo(dynamodb_insert, chargeback_table, quote_id, report_type, current_time, event,
                                             audit_logger_table)
         end_time = time.perf_counter()
         logger.info(f'{lambda_name}: {function_name}: Duration : {end_time - start_time} seconds')
@@ -158,8 +155,8 @@ def log_event_details(event, context):
                 total_ordered_drivers = payload['totalOrderedDrivers']
             else:
                 total_ordered_drivers = 0
-            if 'orderedDriverForCurrReq' in payload:
-                current_ordered_drivers = payload['orderedDriverForCurrReq']
+            if 'orderedDriversForCurrReq' in payload:
+                current_ordered_drivers = payload['orderedDriversForCurrReq']
             else:
                 current_ordered_drivers = 0
             if 'baseState' in payload:
@@ -216,6 +213,8 @@ def request_payload(event):
             dynamodb_insert['QuoteDate'] = check_property_exist(chargeback, 'quoteDate')
         if "quoteTime" in chargeback:
             dynamodb_insert['QuoteTime'] = check_property_exist(chargeback, 'quoteTime')
+        if "firstOrderDate" in chargeback:
+            dynamodb_insert['FirstOrderDate'] = check_property_exist(chargeback, 'firstOrderDate')
         if "orderDate" in chargeback:
             dynamodb_insert['OrderDate'] = check_property_exist(chargeback, 'orderDate')
         if "orderTime" in chargeback:
@@ -230,14 +229,12 @@ def request_payload(event):
             dynamodb_insert['PolicyNumber'] = check_property_exist(chargeback, 'policyNumber')
         if "shallOrderFlag" in chargeback:
             dynamodb_insert['shallOrderFlag'] = check_property_exist(chargeback, 'shallOrderFlag')
-        if "tracker" in chargeback:
-            dynamodb_insert['tracker'] = check_property_exist(chargeback, 'tracker')
-        if "totalDriver" in chargeback:
-            dynamodb_insert['TotalDriver'] = check_property_exist(chargeback, 'totalDriver')
-        if "orderedDriverForCurrReq" in chargeback:
-            dynamodb_insert['DriversOrderedOn'] = check_property_exist(chargeback, 'orderedDriverForCurrReq')
+        if "totalDrivers" in chargeback:
+            dynamodb_insert['TotalDrivers'] = check_property_exist(chargeback, 'totalDrivers')
+        if "orderedDriversForCurrReq" in chargeback:
+            dynamodb_insert['DriversOrderedOn'] = check_property_exist(chargeback, 'orderedDriversForCurrReq')
         if "totalOrderedDrivers" in chargeback:
-            dynamodb_insert['totalOrderedDrivers'] = check_property_exist(chargeback, 'totalOrderedDrivers')
+            dynamodb_insert['TotalOrderedDrivers'] = check_property_exist(chargeback, 'totalOrderedDrivers')
         if "payload" in event:
             dynamodb_insert['payload'] = event['payload']
 
@@ -270,7 +267,7 @@ def check_property_exist(event, field):
 
 
 ## Function for inserting data into DynamoDB
-def insert_data_dynamo(payload_for_dynamodb, chargeback_table, quote_id, current_time, event, audit_logger_table):
+def insert_data_dynamo(payload_for_dynamodb, chargeback_table, quote_id, report_type, current_time, event, audit_logger_table):
     function_name = 'insert_data_dynamo'
     try:
         mvr_date = ''
@@ -281,9 +278,9 @@ def insert_data_dynamo(payload_for_dynamodb, chargeback_table, quote_id, current
         order_date = ''
         closing_month = ''
         closing_year = ''
-
+        getquery = quote_id + '#' + report_type
         transaction_response = table.query(
-            KeyConditionExpression=Key('PK').eq(quote_id),
+            KeyConditionExpression=Key('PK').eq(getquery),
             ScanIndexForward=False,
             Limit=10,
             ConsistentRead=True
@@ -328,8 +325,8 @@ def insert_data_dynamo(payload_for_dynamodb, chargeback_table, quote_id, current
             logger.info(
                 f'FirstOrderDate: {first_order_date}, OrderDate: {order_date}, ClosingMonth : {closing_month}, ClosingYear: {closing_year}')
 
-            if "orderedDriverForCurrReq" in payload['chargeback']:
-                status_code,total_charge, new_charge, per_mvr_charge = get_mvr_charge(event, payload, transaction_response,audit_logger_table)
+            if "orderedDriversForCurrReq" in payload['chargeback']:
+                status_code,total_charge, new_charge, per_report_charge = get_charge(event, payload, transaction_response,audit_logger_table)
                 if(status_code!=200 ):
                     return {
                     'statusCode': 500,
@@ -337,13 +334,13 @@ def insert_data_dynamo(payload_for_dynamodb, chargeback_table, quote_id, current
                         "message": "DynamoDB insertion failed for QuoteID:" + quote_id + " due to decision model call failure"
                     })
                 }
-                payload_for_dynamodb['totalCharge'] = new_charge
-                payload_for_dynamodb['costPerMVR'] = Decimal(per_mvr_charge)
+                payload_for_dynamodb['totalCharge'] = 0
+                payload_for_dynamodb['costPerReport'] = Decimal(per_report_charge)
                 payload_for_dynamodb['currentRequestCharge'] = Decimal(total_charge)
         
         else:
             payload_for_dynamodb['totalCharge'] = 0
-            payload_for_dynamodb['costPerMVR'] = 0
+            payload_for_dynamodb['costPerReport'] = 0
             payload_for_dynamodb['currentRequestCharge'] = 0
 
         
@@ -399,23 +396,23 @@ def insert_record_in_audit_table(audit_logger_table, payload_for_audit_table):
         logger.exception(f'Exception occurred while inserting in audit table : {lambda_name} : {function_name} : Exception : {ex}')
 
 
-def get_mvr_charge(event, payload, transaction_response,audit_logger_table):
+def get_charge(event, payload, transaction_response,audit_logger_table):
     total_charge = 0
     new_charge = 0
-    per_mvr_charge = 0
+    per_report_charge = 0
     existing_charge = 0
     status_code= 200
-    function_name = 'get_mvr_charge'
+    function_name = 'get_charge'
     eastern = timezone('US/Eastern')  ## US/Eastern
     loc_dt = datetime.datetime.now(eastern)
     current_time=str(loc_dt.strftime("%Y-%m-%d %H:%M:%S.%f"))
     try:
-        if(payload['chargeback']['orderedDriverForCurrReq'] > 0 and payload['chargeback']['firstOrderDate']!= ''):
+        if(payload['chargeback']['orderedDriversForCurrReq'] > 0 and payload['chargeback']['firstOrderDate']!= ''):
             
             chargeback_cost = retrieve_cost(payload['chargeback']['baseState'], payload['chargeback']['reportType'])
         
-            total_charge = payload['chargeback']['orderedDriverForCurrReq'] * chargeback_cost
-            per_mvr_charge = chargeback_cost
+            total_charge = payload['chargeback']['orderedDriversForCurrReq'] * chargeback_cost
+            per_report_charge = chargeback_cost
             logger.info(f'Total Charge : {total_charge}')
 
             if transaction_response['Count'] > 0:
@@ -428,17 +425,18 @@ def get_mvr_charge(event, payload, transaction_response,audit_logger_table):
             if transaction_response['Count'] > 0:
                 if 'totalCharge' in transaction_response['Items'][0]:
                     new_charge = transaction_response['Items'][0]['totalCharge']
-                if 'costPerMVR' in transaction_response['Items'][0]:
-                    per_mvr_charge = transaction_response['Items'][0]['costPerMVR']
+                if 'costPerReport' in transaction_response['Items'][0]:
+                    per_report_charge = transaction_response['Items'][0]['costPerRepor']
     except Exception as ex:
         logger.exception(f'Exception occurred while getting charge : {lambda_name} : {function_name} : Exception : {ex}')
-    return status_code,total_charge,new_charge,per_mvr_charge
+    return status_code,total_charge,new_charge,per_report_charge
 
-
-def retrieve_from_dynamo_db(quote_id, source, chargeback_table):
+## Method to retrieve the latest record from dynamoDB for getChargeback
+def retrieve_from_dynamo_db(quote_id, reportType, chargeback_table):
     table = dynamodb_client.Table(chargeback_table)
+    getquery = quote_id + '#' + reportType
     response = table.query(
-        KeyConditionExpression=Key('PK').eq(quote_id),
+        KeyConditionExpression=Key('PK').eq(getquery),
         ScanIndexForward=False,
         Limit=1,
         ConsistentRead=True
@@ -472,7 +470,8 @@ def retrieve_from_dynamo_db(quote_id, source, chargeback_table):
         }
 
         return response_payload
-        
+
+## Method for retrieving the cost from Dynamo DB based on State and reportType
 def retrieve_cost(baseState, reportType):
     chargeback_cost_table = os.environ['CHARGEBACK_COST_TABLE']
     table = dynamodb_client.Table(chargeback_cost_table)

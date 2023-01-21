@@ -9,14 +9,11 @@ from aws_lambda_powertools import Logger
 from botocore.config import Config
 from pytz import timezone
 
-
-
 config = Config(
     retries = dict(
-        max_attempts = 1
+        max_attempts = 2
     )
 )
-
 
 sf_client = boto3.client('stepfunctions',config=config)
 dynamoDB_client = boto3.resource('dynamodb')
@@ -37,11 +34,9 @@ def lambda_handler(event, context):
     resource=''
     request_payload=''
     audit_logger_table=os.environ['AUDIT_LOGGER_TABLE']
-    
     eastern = timezone('US/Eastern')## US/Eastern
     loc_dt = datetime.now(eastern)
     timestamp = loc_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
-
 
     try:
         start_time = time.perf_counter()
@@ -52,7 +47,7 @@ def lambda_handler(event, context):
         if(event['resource']=="/getChargeback"):
             request_payload= json.loads(event['body'])
             quote_id= request_payload['quoteID']
-            report_type = request_payload['chargeback']['reportType']
+            report_type = request_payload['reportType']
             resource = event['resource']
             body = event['body']
             source = "APIGateway"
@@ -106,9 +101,7 @@ def lambda_handler(event, context):
                 audit_table.put_item(Item=payload_for_audit_table)
         except Exception as ex:
             logger.exception(f'{lambda_name} : insert_failure_record_in_audit_table : Error in inserting failed record, Exception : {ex}')
-            
         logger.info(': %s : %s : Duration : %s seconds', lambda_function_name, function_name, end_time - start_time)
-
         return response
        
     try:

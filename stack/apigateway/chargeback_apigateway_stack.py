@@ -116,6 +116,9 @@ class ChargebackApigatewayStack(cdk.Stack):
                     "quoteID": {
                         "type": apigw.JsonSchemaType.STRING
                     },
+                    "totalDrivers": {
+                        "type": apigw.JsonSchemaType.INTEGER
+                    },
                     "totalOrderedDrivers": {
                     "type": apigw.JsonSchemaType.INTEGER
                     },
@@ -154,9 +157,6 @@ class ChargebackApigatewayStack(cdk.Stack):
                     },
                     "policyNumber": {
                         "type": [apigw.JsonSchemaType.STRING,apigw.JsonSchemaType.NULL]
-                    },
-                    "totalDrivers": {
-                        "type": apigw.JsonSchemaType.INTEGER
                     },
                     "driver":{
                         "type":apigw.JsonSchemaType.ARRAY,

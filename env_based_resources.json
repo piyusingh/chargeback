@@ -35,7 +35,19 @@
 			"LOG_LEVEL": "INFO",
 			"SERVICE": "Chargeback-TriggerStateMachine",
 			"AUDIT_LOGGER_TABLE": "Chargeback-Audit",
-			"STATE_MACHINE_ARN": "arn:aws:states:us-east-1:187879053795:stateMachine:Chargeback-StateMachine"
+			"STATE_MACHINE_ARN": "arn:aws:states:us-east-1:187879053795:stateMachine:ChargebackStateMachine"
+		},
+		"readingFromDynamoDBStreams_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-ReadingFromDynamoDBStreams",
+			"STREAM_NAME": "ChargeBackStream",
+			"AUDIT_LOGGER_TABLE": "Chargeback-Audit"
+		},
+		"readingFromKinesis_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-ReadingFromKinesis",
+			"AUDIT_LOGGER_TABLE": "Chargeback-Audit",
+			"CHARGEBACK_TABLE": "Chargeback"
 		},
 		"prepareDataSaveToDynamoDB_lambda_vars": {
 			"LOG_LEVEL": "INFO",
@@ -62,6 +74,16 @@
 	"dynamo_db_env_vars":{
 			"dynamodb_table_name": "Chargeback",
 			"dynamodb_table_arn": "arn:aws:dynamodb:us-east-1:187879053795:table/Chargeback"
+	},
+	"kinesis_info": {
+		"shard_count": 1,
+		"retention_period": 24
+
+	},
+	"kinesis_event_parameters": {
+		"batch_size": 1,
+		"retry_attempts": 0,
+		"max_record_age": 86400
 	},
 		"dynamodb_stream_event_batch_parameters": {
 			"batch_size": 1,
