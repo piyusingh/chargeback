@@ -47,9 +47,15 @@ def lambda_handler(event, context):
                 logger.info('Ignore event')
             else:
                 new_image= event['Records'][0]['dynamodb']['NewImage']
-                if(new_image['PK']['S']=='v0ProducerCode'):
-                    logger.info('Ignore producer code event')
-                    return
+                if 'M' in new_image['payload'].keys():
+                    mapdata = new_image['payload']['M']
+                    final_mapdata = from_dynamodb_to_json(mapdata)
+                    event_payload=final_mapdata
+                    report_type = event_payload['chargeback']['reportType']
+                    new_image_pk = f'v0ProducerCode#{report_type}'
+                    if(new_image['PK']['S']==new_image_pk):
+                        logger.info('Ignore producer code event')
+                        return
                 logger.info(f'{lambda_name} : {function_name} : Transaction new_image event : {new_image}')
                 return put_record_to_kinesis(new_image, record, start_time,event)
     except:
@@ -69,7 +75,7 @@ def put_record_to_kinesis(new_image, record, start_time,event):
         producer_total_charge=0
         producer_code_charge=0
         current_request_charge=0
-        cost_per_mvr=0
+        cost_per_report=0
         transaction_total_charge=0
         if 'M' in new_image['payload'].keys():
             mapdata = new_image['payload']['M']
@@ -81,8 +87,10 @@ def put_record_to_kinesis(new_image, record, start_time,event):
             current_request_charge=new_image['currentRequestCharge']['N']
         if 'totalCharge' in new_image:
             transaction_total_charge= new_image['totalCharge']['N']
-        if 'costPerMVR' in new_image:
-            cost_per_mvr=new_image['costPerMVR']['N']
+        if 'costPerReport' in new_image:
+            cost_per_report=new_image['costPerReport']['N']
+        if 'ReportType' in new_image:
+            report_type=new_image['ReportType']['S']
 
         event_payload['PK']= new_image['PK']['S']
         event_payload['SK']= new_image['SK']['S']
@@ -90,7 +98,8 @@ def put_record_to_kinesis(new_image, record, start_time,event):
         event_payload['chargeback']['currentRequestCharge']=current_request_charge
         event_payload['chargeback']['charge']= producer_total_charge
         event_payload['chargeback']['totalCharge']= transaction_total_charge
-        event_payload['chargeback']['costPerMVR']= cost_per_mvr
+        event_payload['chargeback']['costPerReport']= cost_per_report
+        event_payload['chargeback']['reportType'] = report_type
         
         correlation_id = new_image['CorrelationID']['S']
         quote_id= event_payload['chargeback']['quoteID']

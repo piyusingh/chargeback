@@ -89,7 +89,6 @@ def lambda_handler(event, context):
             current_cycle= datetime.now() - relativedelta(months=2)
             current_cycle_month = str(current_cycle.strftime("%B"))
             current_cycle_year = str(current_cycle.strftime("%Y"))
-            gspk_order_dt=datetime.strptime(first_order_date, '%m/%d/%Y').strftime("%Y%m")
         else:
             return {
                 'statusCode': 200,
@@ -133,16 +132,16 @@ def lambda_handler(event, context):
             ScanIndexForward=False,
             Limit=1
             )
-            
+        
+        transaction_pk = f'{quote_id}#{report_type}'
         transaction_response = table.query(
-                            KeyConditionExpression=Key('PK').eq(quote_id),
+                            KeyConditionExpression=Key('PK').eq(transaction_pk),
                             ScanIndexForward=False,
                             Limit=10,
                             ConsistentRead= True
                             )
+        print('transactionResponse',transaction_response)
         
-        source_transaction_response=''
-       
         if transaction_response['Count'] > 0 and  'SK' in event_payload:
             existing_charge=0
             transaction_sort_key= event_payload['SK']
@@ -160,7 +159,7 @@ def lambda_handler(event, context):
             if(event_payload['chargeUpdatedFlag']== False):
                 table.update_item(
                     Key={
-                        'PK': quote_id,
+                        'PK': transaction_pk,
                         'SK': transaction_sort_key
                         },
                     UpdateExpression= "SET totalCharge= :var1,chargeUpdatedFlag= :var2",
@@ -185,9 +184,9 @@ def lambda_handler(event, context):
                         'producerCode':producer_code,'transactionResponse':transaction_response})
 
         if(producer_code_super_set['Count'] == 0): ## Create  Producer Code Aggregate entry
-            return insert_producer_code_row(report_type,event, quote_id, correlation_id, policyissued, report_flag, transaction_response,source_transaction_response, event_payload, producer_code_key, sort_key, producer_code, table,previous_bind_ratio,delta_days)
+            return insert_producer_code_row(report_type,event, quote_id, correlation_id, policyissued, report_flag, transaction_response, event_payload, producer_code_key, sort_key, producer_code, table,previous_bind_ratio,delta_days)
         else:
-            return update_producer_code_row(report_type,event, quote_id, correlation_id, policyissued, transaction_response, source_transaction_response,event_payload, producer_code_key, sort_key, producer_code, table, producer_code_super_set,previous_bind_ratio,delta_days)
+            return update_producer_code_row(report_type,event, quote_id, correlation_id, policyissued, transaction_response, event_payload, producer_code_key, sort_key, producer_code, table, producer_code_super_set,previous_bind_ratio,delta_days)
                 
     except Exception as ex:
         logger.exception(f'{lambda_name} : lambda_handler : Exception occurred : {ex}')
@@ -197,7 +196,7 @@ def lambda_handler(event, context):
             'body': json.dumps('Oops something went wrong!')
             }
 
-def insert_producer_code_row(report_type,event, quote_id, correlation_id, policyissued, report_flag, transaction_response,source_transaction_response, event_payload, producer_code_key, sort_key, producer_code, table,previous_bind_ratio,delta_days):
+def insert_producer_code_row(report_type,event, quote_id, correlation_id, policyissued, report_flag, transaction_response, event_payload, producer_code_key, sort_key, producer_code, table,previous_bind_ratio,delta_days):
     function_name = 'insert_producer_code_row'
     logger.info('Insert')
     try:
@@ -274,7 +273,7 @@ def insert_producer_code_row(report_type,event, quote_id, correlation_id, policy
             'body': json.dumps('Producer code row insert failed')
             }
 
-def update_producer_code_row(report_type,event, quote_id, correlation_id, policyissued, transaction_response, source_transaction_response,event_payload, producer_code_key, sort_key, producer_code, table, producer_code_super_set,previous_bind_ratio,delta_days):
+def update_producer_code_row(report_type,event, quote_id, correlation_id, policyissued, transaction_response, event_payload, producer_code_key, sort_key, producer_code, table, producer_code_super_set,previous_bind_ratio,delta_days):
     function_name = 'update_producer_code_row'
     logger.info('Update')
     try:
@@ -293,6 +292,7 @@ def update_producer_code_row(report_type,event, quote_id, correlation_id, policy
             existing_charge =  Decimal(producer_code_super_set['Items'][0]['Charge'])
         if('TotalAmount' in producer_code_super_set['Items'][0]):
             total_producer_charge =  Decimal(producer_code_super_set['Items'][0]['TotalAmount'])
+            print('total_producer_charge', total_producer_charge)
         if('BoundCharges' in producer_code_super_set['Items'][0]):
             bound_amount =  Decimal(producer_code_super_set['Items'][0]['BoundCharges'])
         else:
@@ -384,7 +384,7 @@ def update_producer_code_row(report_type,event, quote_id, correlation_id, policy
                         'PK': producer_code_key,
                         'SK': sort_key
                         },
-                    UpdateExpression= "SET BindRatio= :var1, Charge= :var2, TotalAmount= :var3, OrderCounter=:var4,BindCounter=:var5, payload=:var6, BoundCharges=:var9",
+                    UpdateExpression= "SET BindRatio= :var1, Charge= :var2, TotalAmount= :var3, OrderCounter=:var4,BindCounter=:var5, payload=:var6, BoundCharges=:var7",
                     ExpressionAttributeValues= {
                         ':var1': bind_ratio,
                         ':var2': charge_amount,

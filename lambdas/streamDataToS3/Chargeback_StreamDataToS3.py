@@ -131,7 +131,7 @@ def put_record_to_S3(event,new_image):
 	payload= json.loads(payload)
 	quote_id= event_payload['chargeback']['quoteID']
 	quote_id_report = event_payload['chargeback']['quoteID'] + '#' + reportType
-	if(new_image['PK']['S']== quote_id_report and payload['chargeback']['shallOrderFlag']== True and 'firstOrderDate' in payload['chargeback'] and payload['chargeback']['firstOrderDate']!= '' and payload['chargeback']['chargeUpdatedFlag']== True):
+	if(new_image['PK']['S']== quote_id_report and payload['chargeback']['shallOrderFlag']== True and 'firstOrderDate' in payload['chargeback'] and payload['chargeback']['firstOrderDate']!= '' and payload['chargeback']['chargeUpdatedFlag']== False):
 		s3_parquet(event, new_image, payload)
 
 	try:
@@ -171,14 +171,7 @@ def s3_parquet(event, new_image, payload):
 			reporting_month= order_date.strftime("%B")
 			close_date=date_
 		input_data=payload['chargeback']
-		if("policyIssueDate" in input_data):
-			policy_issue_date_time = input_data['policyIssueDate'] +  input_data['policyIssueTime']
-		if("quoteDate" in input_data):
-			quote_date_time = input_data['quoteDate'] +  input_data['quoteTime']
-		if("orderDate" in input_data):
-			order_date_time =  input_data['orderDate'] +  input_data['orderTime']
-			
-		payload_fields = ['pk','sk', 'quoteID', 'totalDriver','totalOrderedDrivers','policyIssued','policyNumber','correlationID','reportType','orderCounterFlag','waived','totalCharge','baseState','shallOrderFlag','lob']
+		payload_fields = ['pk','sk', 'quoteID', 'totalDrivers','totalOrderedDrivers','policyIssued','policyNumber','correlationID','reportType','orderCounterFlag','waived','totalCharge','baseState','shallOrderFlag','lob']
 		for item in payload_fields:
 			if item in input_data:
 				report_parquet[item.lower()] = input_data[item]
@@ -197,23 +190,23 @@ def s3_parquet(event, new_image, payload):
 		else:
 			report_parquet['orderdate']= None
 		if(policy_issue_date_time!='' ):
-			report_parquet['issuancedate']= datetime.strptime(policy_issue_date_time, '%m/%d/%Y%H:%M:%S')
+			report_parquet['policyissuedate']= datetime.strptime(policy_issue_date_time, '%m/%d/%Y%H:%M:%S')
 		else:
-			report_parquet['issuancedate']= None
+			report_parquet['policyissuedate']= None
 		if("producerCode" in input_data):
-			report_parquet['secondaryproducercode']= input_data['producerCode']
+			report_parquet['producercode']= input_data['producerCode']
 
 		report_parquet['currenttimestamp'] = timestamp
 		if("tracker" in input_data):
 			report_parquet['clickcounter']= input_data['tracker']
-		if("orderedDriverForCurrReq" in input_data):
-			report_parquet['driversorderedon']= input_data['orderedDriverForCurrReq']
+		if("orderedDriversForCurrReq" in input_data):
+			report_parquet['orderedDriversForCurrReq']= input_data['orderedDriversForCurrReq']
 		if("firstOrderDate" in input_data):
 			report_parquet['closedate']= close_date.date()
 		if("firstOrderDate" in input_data):
 			report_parquet['firstorderdate']= order_date.date()
-		if("costPerMVR" in input_data):
-			report_parquet['costpermvr']= float(input_data['costPerMVR'])
+		if("costPerReport" in input_data):
+			report_parquet['costperreport']= float(input_data['costPerReport'])
 		if("currentRequestCharge" in input_data):
 			report_parquet['chargebackamount']= float(input_data['currentRequestCharge'])
 		if('startDate' in input_data and input_data['startDate']!='' ):

@@ -66,7 +66,7 @@ class ChargebackAthenaStack(cdk.Stack):
 				),
 				glue.Column(
 					name="startDate",
-					type=glue.Schema.STRING
+					type=glue.Schema.DATE
 				),
 				glue.Column(
 					name="reportType",
@@ -82,7 +82,7 @@ class ChargebackAthenaStack(cdk.Stack):
 				),
 				glue.Column(
 					name="policyIssued",
-					type=glue.Schema.STRING
+					type=glue.Schema.BOOLEAN
 				),
 				glue.Column(
 					name="policyIssueDate",
@@ -98,7 +98,7 @@ class ChargebackAthenaStack(cdk.Stack):
 				),
                 glue.Column(
 					name="shallOrderFlag",
-					type=glue.Schema.STRING
+					type=glue.Schema.BOOLEAN
 				),
                 glue.Column(
 					name="totalCharge",
@@ -164,7 +164,7 @@ class ChargebackAthenaStack(cdk.Stack):
 				),
 				glue.Column(
 					name="startDate",
-					type=glue.Schema.STRING
+					type=glue.Schema.DATE
 				),
 				glue.Column(
 					name="reportType",
@@ -180,7 +180,7 @@ class ChargebackAthenaStack(cdk.Stack):
 				),
 				glue.Column(
 					name="policyIssued",
-					type=glue.Schema.STRING
+					type=glue.Schema.BOOLEAN
 				),
 				glue.Column(
 					name="policyIssueDate",
@@ -196,7 +196,7 @@ class ChargebackAthenaStack(cdk.Stack):
 				),
                 glue.Column(
 					name="shallOrderFlag",
-					type=glue.Schema.STRING
+					type=glue.Schema.BOOLEAN
 				),
                 glue.Column(
 					name="totalCharge",
