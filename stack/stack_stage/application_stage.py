@@ -55,6 +55,6 @@ class ChargebackStacks(cdk.Stage):
     expensereport_lambda_stack = ExpenseReportLambdaStack( self,'ExpenseReportLambdaStack',common_stack,raw_config=raw_config)
     chargebackreport_step_functions = ChargebackReportStepFunctionsStack( self,'ChargebackReportStepFunctionStack', reportcsv_lambda_stack = reportcsv_lambda_stack.reportCSV,transactionreport_lambda_stack = transactionreport_lambda_stack.transactionReport,aggregatereport_lambda_stack = aggregatereport_lambda_stack.aggregateReport,expensereport_lambda_stack = expensereport_lambda_stack.expenseReport,raw_config=raw_config)
     chargebackapigatewaystack = ChargebackApigatewayStack( self,'ChargebackApigatewayStack',raw_config=raw_config)
-    #chargebackathenastack = ChargebackAthenaStack( self,'ChargebackAthenaStack',raw_config=raw_config)
+    chargebackathenastack = ChargebackAthenaStack( self,'ChargebackAthenaStack',raw_config=raw_config)
 
    
