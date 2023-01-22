@@ -95,8 +95,8 @@
 	"athena_info":{
 		"database_name": "chargeback",
 		"common_bucket": "chargebackinsurance",
-		"mvr_table_name": "MVR",
-		"clue_table_name": "CLUE",
+		"mvr_table_name": "mvr",
+		"clue_table_name": "clue",
 		"mvr_table_s3_prefix": "chargebackinsurance/MVR",
 		"clue_table_s3_prefix": "chargebackinsurance/CLUE"
 	},

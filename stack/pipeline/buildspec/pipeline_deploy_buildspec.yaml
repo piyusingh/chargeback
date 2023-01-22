@@ -32,7 +32,7 @@ phases:
       - npx cdk deploy ChargebackPipelineStack/development/S3 --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackStepFunctionStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackReportStepFunctionStack --require-approval never
-      - npx cdk deploy ChargebackPipelineStack/development/ChargebackAthenaStack--require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/ChargebackAthenaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ChargebackApigatewayStack --require-approval never
 
        
