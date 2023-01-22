@@ -24,6 +24,7 @@ from stack.lambda_functions.expenseReport_lambda_stack import ExpenseReportLambd
 from stack.step_functions.chargeback_report_step_functions_stack import ChargebackReportStepFunctionsStack
 from stack.s3.chargeback_s3_stack import ChargebackS3Stack
 from stack.step_functions.chargeback_step_functions_stack import ChargebackStepFunctionsStack
+from stack.athena.chargeback_athena_stack import ChargebackAthenaStack
 from stack.apigateway.chargeback_apigateway_stack import ChargebackApigatewayStack
 
 
@@ -47,12 +48,13 @@ class ChargebackStacks(cdk.Stage):
     chargebacks3stack = ChargebackS3Stack( self,'S3')
     chargebackkinesisstack = ChargebackKinesisStack( self,'Kinesis',raw_config=raw_config)
     chargeback_step_functions = ChargebackStepFunctionsStack( self,'ChargebackStepFunctionStack',raw_config=raw_config)
-    chargebackapigatewaystack = ChargebackApigatewayStack( self,'ChargebackApigatewayStack',raw_config=raw_config)
     reportcsv_lambda_stack = ReportCSVLambdaStack( self,'ReportCSVLambdaStack',common_stack,raw_config=raw_config)
     aggregatereport_lambda_stack = AggregateReportLambdaStack( self,'AggregateReportLambdaStack',common_stack,raw_config=raw_config)
     transactionreport_lambda_stack = TransactionReportLambdaStack( self,'TransactionReportLambdaStack',common_stack,raw_config=raw_config)
     reporttriggerstatemachine_lambda_stack = ReportTriggerStateMachineLambdaStack( self,'ReportTriggerStateMachineLambdaStack',common_stack,raw_config=raw_config)
     expensereport_lambda_stack = ExpenseReportLambdaStack( self,'ExpenseReportLambdaStack',common_stack,raw_config=raw_config)
     chargebackreport_step_functions = ChargebackReportStepFunctionsStack( self,'ChargebackReportStepFunctionStack', reportcsv_lambda_stack = reportcsv_lambda_stack.reportCSV,transactionreport_lambda_stack = transactionreport_lambda_stack.transactionReport,aggregatereport_lambda_stack = aggregatereport_lambda_stack.aggregateReport,expensereport_lambda_stack = expensereport_lambda_stack.expenseReport,raw_config=raw_config)
+    chargebackapigatewaystack = ChargebackApigatewayStack( self,'ChargebackApigatewayStack',raw_config=raw_config)
+    #chargebackathenastack = ChargebackAthenaStack( self,'ChargebackAthenaStack',raw_config=raw_config)
 
    

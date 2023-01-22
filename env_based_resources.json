@@ -92,6 +92,14 @@
 			"AMOUNT_CRITERIA": "50"
 		}
 	},
+	"athena_info":{
+		"database_name": "chargeback",
+		"common_bucket": "chargebackinsurance",
+		"mvr_table_name": "MVR",
+		"clue_table_name": "CLUE",
+		"mvr_table_s3_prefix": "chargebackinsurance/MVR",
+		"clue_table_s3_prefix": "chargebackinsurance/CLUE"
+	},
 	"dynamo_db_env_vars":{
 			"dynamodb_table_name": "Chargeback",
 			"dynamodb_table_arn": "arn:aws:dynamodb:us-east-1:187879053795:table/Chargeback"

@@ -14,6 +14,7 @@ class EnvSpecific:
         self.apigateway_info = d["apigateway_info"]
         self.kinesis_info = d["kinesis_info"]
         self.kinesis_event_parameters = d["kinesis_event_parameters"]
+        self.athena_info = d["athena_info"]
         
 class RawConfig:
     """

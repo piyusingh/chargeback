@@ -49,8 +49,8 @@ class ChargebackReportStepFunctionsStack(cdk.Stack):
         definition_sf = ConcatParquetFiles.next(TransactionReport).next(AggregateReport).next(ExpenseReport)
 
         #Log group creation
-        log_group = logs.LogGroup(self, "ChargebackStateMachineLogGroup",
-                                  log_group_name = "ChargebackStateMachineLogGroup",
+        log_group = logs.LogGroup(self, "ChargebackReportStateMachineLogGroup",
+                                  log_group_name = "ChargebackReportStateMachineLogGroup",
                                   retention = logs.RetentionDays.INFINITE)
 
         sfn.StateMachine(
