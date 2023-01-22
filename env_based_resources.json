@@ -97,8 +97,8 @@
 		"common_bucket": "chargebackinsurance",
 		"mvr_table_name": "mvr",
 		"clue_table_name": "clue",
-		"mvr_table_s3_prefix": "chargebackinsurance/MVR",
-		"clue_table_s3_prefix": "chargebackinsurance/CLUE"
+		"mvr_table_s3_prefix": "MVR",
+		"clue_table_s3_prefix": "CLUE"
 	},
 	"dynamo_db_env_vars":{
 			"dynamodb_table_name": "Chargeback",
