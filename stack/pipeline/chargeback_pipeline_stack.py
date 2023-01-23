@@ -132,9 +132,9 @@ class ChargebackPipelineStack(cdk.Stack):
                                         )
                                 ])
         # Unit test stage
-        testing_stage = pipeline.add_stage(stage_name="Unit Testing",actions=[
+        testing_stage = pipeline.add_stage(stage_name="Unit_Testing",actions=[
                                     codepipeline_actions.CodeBuildAction(
-                                            action_name="SonarQube_Scan",
+                                            action_name="UnitTest",
                                             project=unit_tests,
                                             input=source_output
                                         )
