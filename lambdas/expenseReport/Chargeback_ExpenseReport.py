@@ -129,8 +129,12 @@ def dataframe_structure(report_type, s3_resource,df_1,df_split,group,year,month,
     mvr_cost = float("{:.2f}".format(sum(cost)))
     df_split['producerCode']= df_split['producerCode'].apply(lambda x: '{0:0>7}'.format(x))
     df_split['quoteId']= df_split['quoteId'].apply(lambda x: '{0:0>10}'.format(x))
+    df_split = df_split[["baseState", "producerCode","orderedDriversForCurrReq",
+                    "quoteId", "reportType","costPerReport","quoteDate","policyNumber",
+                    "policyIssueDate","waived",
+                    "bindRatio","totalAmount"]]
     writer = pd.ExcelWriter("/tmp/Chargeback_ExpenseReport.xlsx", engine='xlsxwriter')
-    df_split.to_excel(writer,index = False, sheet_name = 'Expense_Report',startrow=9,freeze_panes=(10,0))
+    df_split.to_excel(writer,index = False, sheet_name = 'Expense_Report',startrow=7,freeze_panes=(8,0))
     workbook = writer.book
     worksheet = writer.sheets['Expense_Report']
     format_excel_output(df_split,workbook,worksheet,mvr_cost)
@@ -146,16 +150,15 @@ def dataframe_structure(report_type, s3_resource,df_1,df_split,group,year,month,
 def format_excel_output(df_merge,workbook,worksheet,mvr_cost):
     
     """Change header names"""
-    df_merge.rename(columns={"baseState": "Base State", "producerCode": "Producer Code","orderedDriversForCurrReq":"Drivers Ordered On",
-                    "quoteId": "Quote Id", "reportType": "Report type","costPerReport":"Cost per Report","quoteDate":"Quote Date","policyNumber":"Policy Number",
-                    "policyIssueDate":"Policy Issue Date","waived":"Charge Waived",
-                    "bindRatio":"Bind Ratio","totalAmount":"Total Amount"}, inplace=True)
+    df_merge.rename(columns={"baseState": "BaseState", "producerCode": "ProducerCode","orderedDriversForCurrReq":"DriversOrderedOn",
+                    "quoteId": "QuoteId", "reportType": "ReportType","costPerReport":"CostPerReport","quoteDate":"QuoteDate","policyNumber":"PolicyNumber",
+                    "policyIssueDate":"PolicyIssueDate","waived":"ChargeWaived",
+                    "bindRatio":"BindRatio","totalAmount":"TotalAmount"}, inplace=True)
                    
     '''cell format for colour in header'''
     cell_format = workbook.add_format({'bold': True, 'bg_color': '#b6d7a8','border': 1 })
-    print(df_merge.columns.values)
     for col_num, value in enumerate(df_merge.columns.values):
-        worksheet.write(9, col_num, value, cell_format)
+        worksheet.write(7, col_num, value, cell_format)
         column_len = df_merge[value].astype(str).str.len().max()
         column_len = max(column_len,len(value)) + 3
         worksheet.set_column(col_num,col_num,column_len)
@@ -164,27 +167,23 @@ def format_excel_output(df_merge,workbook,worksheet,mvr_cost):
     row_format = workbook.add_format({'align': 'right','valign':'top'})
     heading_format = workbook.add_format({'align': 'center','valign':'vcenter','bold': True,'border':1})
     other_format = workbook.add_format({'align': 'left','valign':'vcenter','bold': False})
-    for agent_id in df_merge["Producer Code"].unique():
-        index = df_merge.loc[df_merge["Producer Code"]==agent_id].index.values + 1
-        print(index)
-        df_merge['Bind Ratio'] = df_merge['Bind Ratio'].fillna('')
-        df_merge['Charge Waived'] = df_merge['Charge Waived'].fillna('')
+    for agent_id in df_merge["ProducerCode"].unique():
+        index = df_merge.loc[df_merge["ProducerCode"]==agent_id].index.values + 1
+        df_merge['BindRatio'] = df_merge['BindRatio'].fillna('')
+        df_merge['ChargeWaived'] = df_merge['ChargeWaived'].fillna('')
         if len(index) < 2:pass
         else:
-            worksheet.merge_range(index[0]+11, 12, index[-1]+11, 12, df_merge.loc[index[0], 'Bind Ratio'], merge_format)
-            worksheet.merge_range(index[0]+11, 13, index[-1]+11, 13, df_merge.loc[index[0], 'Total Amount'], row_format)
+            worksheet.merge_range(index[0]+7, 10, index[-1]+7, 10, df_merge.loc[index[0], 'BindRatio'], merge_format)
+            worksheet.merge_range(index[0]+7, 11, index[-1]+7, 11,df_merge.loc[index[0], 'TotalAmount'], row_format)
             
     '''Heading to the Sheet and other required additional data'''  
-    row_num = df_merge.index.values[-1] + 13 
-    worksheet.merge_range('A2:G2', 'Chargeback Expense Report', heading_format)
+    row_num = df_merge.index.values[-1] + 12
+    sheet_name = f"{df_merge['ReportType'].iloc[0]} Expense Report"
+    worksheet.merge_range('A2:G2', sheet_name, heading_format)
     worksheet.merge_range('A3:G3', todays_date.strftime("%B, %Y"), heading_format)
     worksheet.merge_range('A5:D5', 'Date Report Generated: '+ todays_date.strftime("%d-%b-%Y"), other_format)
-    worksheet.merge_range('A7:D7', f'Total Cost:  ${mvr_cost}', other_format)
-    worksheet.merge_range( row_num, 0, row_num, 5,'Bind Ratio = # Bound Policies/# Chargeback Ordered must be > 50% to avoid monthly charge ', other_format)
-    worksheet.merge_range( row_num+1,0,row_num+1,5,'Charge = Cost (by state) * # Total # of Drivers (Unbound Policies)', other_format)
-    worksheet.merge_range( row_num+2,0,row_num+2,5,'Period = Month chargeback ordered + end of day of Month 3 ', other_format)
+    worksheet.merge_range('A6:D6', f'Total Cost:  ${mvr_cost}', other_format)
     
-
 def upload_excel_to_s3(report_type, s3_resource, file_name, bucket, key, year, month,rec_year,rec_month):
     
     try:

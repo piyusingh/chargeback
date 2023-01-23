@@ -7,7 +7,8 @@ phases:
       - npm install -g aws-cdk && pip install -r requirements.txt
   build:
     commands:
-      - pytest test
+      - cd test
+      - pytest
 environment:
   buildImage: LinuxBuildImage.STANDARD_5_0
   privileged: True
