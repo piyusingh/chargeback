@@ -68,6 +68,16 @@ class ChargebackPipelineStack(cdk.Stack):
                                                     timeout = cdk.Duration.hours(2),
                                                     build_spec=codebuild.BuildSpec.from_source_filename("stack/pipeline/buildspec/pipeline_update_buildspec.yaml")
                                                 )
+        #Unit testing codebuild project
+        unit_tests = codebuild.PipelineProject(
+            self,
+            "Chargeback_Unit_Test",
+            project_name="Chargeback_Unit_Test",
+            description="A CodeBuild pipeline project to run and validate unit tests",
+            vpc=vpc,
+            security_groups=[security_group],
+            build_spec=codebuild.BuildSpec.from_source_filename("stack/pipeline/buildspec/unit_test_buildspec.yaml")
+        )
         #Role/policy statements
         statement = iam_.PolicyStatement()
         statement.add_actions("ssm:Describe*")
@@ -118,6 +128,14 @@ class ChargebackPipelineStack(cdk.Stack):
                                     codepipeline_actions.CodeBuildAction(
                                             action_name="Self_Mutate",
                                             project=pipeline_update,
+                                            input=source_output
+                                        )
+                                ])
+        # Unit test stage
+        testing_stage = pipeline.add_stage(stage_name="Unit Testing",actions=[
+                                    codepipeline_actions.CodeBuildAction(
+                                            action_name="SonarQube_Scan",
+                                            project=unit_tests,
                                             input=source_output
                                         )
                                 ])

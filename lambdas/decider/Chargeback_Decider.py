@@ -7,12 +7,13 @@ from aws_lambda_powertools import Logger
 
 
 # Global Variables
-sf_client = boto3.client('stepfunctions')
+sf_client = boto3.client('stepfunctions', region_name='us-east-1')
 class chargebackException(Exception):
     pass
 
 ## Beginning of lambda execution
 def lambda_handler(event, context):
+    print(event)
     lambda_function_name = ''
     function_name =  'lambda_handler'
     start_time = ''

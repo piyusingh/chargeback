@@ -80,7 +80,8 @@
 		},
 		"reportCSV_lambda_vars": {
 			"SERVICE": "Chargeback-ReportCSV",
-			"S3_BUCKET": "chargebackinsurance"
+			"S3_BUCKET": "chargebackinsurance",
+			"ATHENA_DB_NAME": "chargeback"
 		},
 		"reportTriggerStateMachine_lambda_vars": {
 			"SERVICE": "Chargeback-ReportTriggerStateMachine",

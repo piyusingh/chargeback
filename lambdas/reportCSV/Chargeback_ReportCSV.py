@@ -68,12 +68,12 @@ def query_athena(report_type, record_year, record_month, start_date, end_date, c
         last_day_of_month = f'{record_month:02d}/{last_day}/{record_year}'
         start_day_of_month = f'{record_month:02d}/01/{record_year}'
         
-        # db_name = os.environ['athena_db_name']
+        db_name = os.environ['ATHENA_DB_NAME']
         athena_client = boto3.client('athena')
 
         s3_output_path = f's3://{OUTPUT_BUCKET}/Unsaved/ingestion_yyyymmdd={cycle_close_year}{cycle_close_month:02d}/'
 
-        athena_query=f"SELECT * FROM {report_type.lower()} where ingestion_yyyymmdd between {start_date} and {end_date} and firstorderdate between cast(date_parse('{start_day_of_month}', '%m/%d/%Y') as DATE ) and cast(date_parse('{last_day_of_month}', '%m/%d/%Y') as DATE )"
+        athena_query=f"SELECT * FROM {db_name}.{report_type.lower()} where ingestion_yyyymmdd between {start_date} and {end_date} and firstorderdate between cast(date_parse('{start_day_of_month}', '%m/%d/%Y') as DATE ) and cast(date_parse('{last_day_of_month}', '%m/%d/%Y') as DATE )"
 
         query_id=''
         query_response = athena_client.start_query_execution(
@@ -92,7 +92,8 @@ def query_athena(report_type, record_year, record_month, start_date, end_date, c
             if state == "SUCCEEDED":
                 output_location=response["QueryExecution"]["ResultConfiguration"]["OutputLocation"]
                 data_df = pd.read_csv(output_location, dtype = {'pk':'str','producercode':'str','quoteid':'str','policynumber':'str'})
-                date_cols = ['quotedate','issuancedate','orderdate','currenttimestamp','closedate','firstorderdate']
+                #date_cols = ['quotedate','issuancedate','orderdate','currenttimestamp','closedate','firstorderdate']
+                date_cols = ['quotedate','policyissuedate','orderdate','currenttimestamp','firstorderdate']
 
                 date_cols.append('startdate')
                 data_df[date_cols] = data_df[date_cols].apply(pd.to_datetime)

@@ -49,9 +49,9 @@ def transform_merged_parquet(report_type, record_year,record_month,cycle_close_m
         merged_csv_df = pd.read_csv(io.BytesIO(s3_object['Body'].read()), dtype ='str')
         available_fields = []
         unavailable_fields = []
-        transaction_level_fields = ['baseState','secondaryProducerCode',
-                            'quoteID', 'costPerMVR','quoteDate','policyNumber','issuanceDate', 'waived']
-        driver_cols = ['totalOrderedDrivers', 'driversOrderedOn']
+        transaction_level_fields = ['baseState','producerCode','reportType',
+                            'quoteID', 'costPerReport','quoteDate','policyNumber','policyIssueDate', 'waived']
+        driver_cols = ['totalOrderedDrivers', 'orderedDriversForCurrReq']
         
         transaction_level_fields = [field.lower() for field in transaction_level_fields]
         driver_cols = [col.lower() for col in driver_cols]
@@ -84,18 +84,18 @@ def transform_merged_parquet(report_type, record_year,record_month,cycle_close_m
             
             final_df = pd.merge(final_df, temp_df, how = 'left', on = ['quoteid'])
 
-            final_df.rename(columns = {'basestate':'baseState', 
-                                   'costpermvr':'costPerMVR', 'quotedate':'quoteDate',
-                                   'policynumber':'policyNumber','issuancedate':'issuanceDate',
-                                   'secondaryproducercode':'producerCode','driversorderedon':'driversOrderedOn',
+            final_df.rename(columns = {'basestate':'baseState', 'reporttype':'reportType',
+                                   'costperreport':'costPerReport', 'quotedate':'quoteDate',
+                                   'policynumber':'policyNumber','policyissuedate':'policyIssueDate',
+                                   'producercode':'producerCode','ordereddriversforcurrreq':'orderedDriversForCurrReq',
                                    'quoteid':'quoteId','waived':'waived'}, inplace = True)            
             
                                        
             final_df.fillna('', inplace=True)
             final_df=final_df.astype(str)
-            final_df.loc[final_df['costPerMVR'] == '', 'costPerMVR'] = '0'
-            final_df.loc[final_df['driversOrderedOn'] == '', 'driversOrderedOn'] = '0'
-            cols = ['driversOrderedOn', 'costPerMVR']
+            final_df.loc[final_df['costPerReport'] == '', 'costPerReport'] = '0'
+            final_df.loc[final_df['orderedDriversForCurrReq'] == '', 'orderedDriversForCurrReq'] = '0'
+            cols = ['orderedDriversForCurrReq', 'costPerReport']
             final_df[cols] = final_df[cols].apply(pd.to_numeric, errors='coerce')
 
             logger.info(f'{lambda_name} : transform_merged_parquet, transaction level file {cycle_close_year}{cycle_close_month:02d} size : {final_df.shape}')

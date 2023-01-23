@@ -1,0 +1,16 @@
+{
+    "success_event_save_chargeback":
+    {
+        "resource": "/saveChargeback",
+        "source": "APIGateway",
+        "body": "{\r\n    \"chargeback\": {\r\n        \"startDate\": \"01/22/2023\",\r\n        \"producerCode\": \"123456\",\r\n        \"policyNumber\": \"\",\r\n        \"baseState\": \"OH\",\r\n        \"lob\": \"PersonalAuto\",\r\n        \"quoteTime\": \"05:49:50\",\r\n        \"policyIssueDate\": \"\",\r\n        \"policyIssueTime\": \"\",\r\n        \"shallOrderFlag\": true,\r\n        \"tracker\": 1,\r\n        \"totalDrivers\": 1,\r\n        \"totalOrderedDrivers\": 1,\r\n        \"orderedDriversForCurrReq\": 1,\r\n        \"orderDate\": \"01/22/2023\",\r\n        \"orderTime\": \"05:50:21\",\r\n        \"firstOrderDate\": \"01/22/2023\",\r\n        \"quoteID\": \"15151511515\",\r\n        \"policyIssued\": false,\r\n        \"quoteDate\": \"01/22/2023\",\r\n        \"reportType\": \"MVR\",\r\n        \"driver\": [{\r\n\t\t\t\"firstName\": \"CATHERINE\",\r\n            \"DOB\": \"04/22/1979\",\r\n            \"lastName\": \"ANDERSON\",\r\n            \"licenseNumber\": \"OH242424\",\r\n            \"licenseType\": \"ActiveUS\",\r\n            \"violation\": [{\r\n                \"occurrenceDate\": \"12/01/2021\",\r\n                \"convictionDate\": \"\",\r\n\t\t\t\t\"incidentCategory\": \"MinorViolation\"\r\n            }, {\r\n                \"occurrenceDate\": \"01/27/2021\",\r\n                \"convictionDate\": \"02/08/2021\",\r\n                \"incidentCategory\": \"MinorViolation\"\r\n            }]\r\n        }]\r\n\r\n    }\r\n}",
+        "correlation_id": "0dd6ac23-50a4-4c25-80ee-5bd1cd897636"
+    },
+    "success_event_get_chargeback":
+    {
+        "resource": "/getChargeback",
+        "source": "APIGateway",
+        "body": "{\r\n    \"quoteID\": \"9830661492\",\r\n    \"reportType\": \"MVR\"\r\n}",
+        "correlation_id": "9e0a9c19-4b09-4d99-afed-28c2383b9a11"
+      }
+}

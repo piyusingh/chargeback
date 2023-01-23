@@ -57,7 +57,15 @@ class ChargebackAthenaStack(cdk.Stack):
 					type=glue.Schema.INTEGER
 				),
 				glue.Column(
+					name="costPerReport",
+					type=glue.Schema.DOUBLE
+				),
+				glue.Column(
 					name="firstOrderDate",
+					type=glue.Schema.DATE
+				),
+				glue.Column(
+					name="cycleCloseDate",
 					type=glue.Schema.DATE
 				),
 				glue.Column(
@@ -155,7 +163,15 @@ class ChargebackAthenaStack(cdk.Stack):
 					type=glue.Schema.INTEGER
 				),
 				glue.Column(
+					name="costPerReport",
+					type=glue.Schema.DOUBLE
+				),
+				glue.Column(
 					name="firstOrderDate",
+					type=glue.Schema.DATE
+				),
+				glue.Column(
+					name="cycleCloseDate",
 					type=glue.Schema.DATE
 				),
 				glue.Column(

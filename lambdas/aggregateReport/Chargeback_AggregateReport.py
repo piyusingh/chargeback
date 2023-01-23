@@ -35,7 +35,7 @@ def concatenate(report_type,start_date,end_date,record_year,record_month,cycle_c
     response = ''
     try:
         transaction_df = convert_to_df(f'{bucket_name}/{report_type}/transactions_report/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}')
-        transaction_level_fields = ['baseState','producerCode','driversOrderedOn','QuoteId','costPerMVR','quoteDate','policyNumber','issuanceDate','waived']
+        transaction_level_fields = ['baseState','producerCode','orderedDriversForCurrReq','QuoteId','costPerReport','quoteDate','policyNumber','policyIssueDate','waived']
 
         if transaction_df.empty == False:
               
@@ -113,9 +113,9 @@ def calculate_total_amount(transaction_df,record_year,record_month):
            
         bind_ratio_merge = pd.merge(transaction_df, temp_df[['producerCode','bindCounter','orderCounter','bindRatio']], how = 'left', on = ['producerCode'])
         bind_ratio_merge["bindRatio"] = pd.to_numeric(bind_ratio_merge["bindRatio"].replace(regex=['%'], value=''), errors='coerce')
-        bind_ratio_merge[['driversOrderedOn','costPerMVR']] = bind_ratio_merge[['driversOrderedOn','costPerMVR']].apply(pd.to_numeric, errors='coerce')
+        bind_ratio_merge[['orderedDriversForCurrReq','costPerReport']] = bind_ratio_merge[['orderedDriversForCurrReq','costPerReport']].apply(pd.to_numeric, errors='coerce')
         bind_ratio_merge.loc[(bind_ratio_merge['bindRatio'].notnull()) & (bind_ratio_merge['bindRatio'] > amount_criteria-1), 'totalAmount'] = 0
-        bind_ratio_merge.loc[(bind_ratio_merge['bindRatio'].notnull()) & (bind_ratio_merge['bindRatio'] < amount_criteria) & (bind_ratio_merge['waived'] == 'N') , 'totalAmount'] = bind_ratio_merge['driversOrderedOn'] * bind_ratio_merge['costPerMVR']
+        bind_ratio_merge.loc[(bind_ratio_merge['bindRatio'].notnull()) & (bind_ratio_merge['bindRatio'] < amount_criteria) & (bind_ratio_merge['waived'] == 'N') , 'totalAmount'] = bind_ratio_merge['orderedDriversForCurrReq'] * bind_ratio_merge['costPerReport']
         bind_ratio_merge.loc[(bind_ratio_merge['bindRatio'].notnull()) & (bind_ratio_merge['bindRatio'] < amount_criteria) & (bind_ratio_merge['waived'] == 'Y'), 'totalAmount'] = 0
         
         total_amount_df = bind_ratio_merge.groupby(['producerCode'])['totalAmount'].sum().reset_index()

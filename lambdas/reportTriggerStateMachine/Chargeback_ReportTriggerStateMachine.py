@@ -52,7 +52,7 @@ def lambda_handler(event, context):
         logger.info(f'{lambda_name} input payload to state machine : {payload} ')
 
         step_function_response = client.start_execution(
-            stateMachineArn = os.environ['state_machine_arn'],
+            stateMachineArn = os.environ['STATE_MACHINE_ARN'],
             input = json.dumps(payload)
         )
         response = {
