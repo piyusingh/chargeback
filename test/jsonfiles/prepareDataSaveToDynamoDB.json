@@ -1,0 +1,102 @@
+{
+    "success_event_preparedatasavetodynamodb_chargeback":
+    {
+        "body": {
+          "chargeback": {
+            "producerCode": "12345678",
+            "lob": "PersonalAuto",
+            "baseState": "OH",
+            "quoteID": "9830661494",
+            "totalDrivers": 5,
+            "totalOrderedDrivers": 3,
+            "orderedDriversForCurrReq": 3,
+            "firstOrderDate": "01/22/2023",
+            "startDate": "01/22/2023",
+            "reportType": "CLUE",
+            "orderDate": "01/22/2023",
+            "orderTime": "05:50:21",
+            "quoteDate": "01/22/2023",
+            "quoteTime": "05:49:50",
+            "policyIssued": "False",
+            "policyIssueDate": "",
+            "policyIssueTime": "",
+            "policyNumber": "",
+            "shallOrderFlag": "True",
+            "driver": [
+              {
+                "firstName": "CATHERINE",
+                "DOB": "04/22/1979",
+                "lastName": "ANDERSON",
+                "licenseNumber": "OH242424",
+                "licenseType": "ActiveUS",
+                "violation": [
+                  {
+                    "occurrenceDate": "12/01/2021",
+                    "convictionDate": "",
+                    "incidentCategory": "MinorViolation"
+                  },
+                  {
+                    "occurrenceDate": "01/27/2021",
+                    "convictionDate": "02/08/2021",
+                    "incidentCategory": "MinorViolation"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "resource": "/saveChargeback",
+        "source": "APIGateway",
+        "correlation_id": "f1945ec5-ac18-4890-9130-ac5f10016436"
+      },
+    "failure_event_preparedatasavetodynamodb_chargeback":
+    {
+        "body": {
+          "chargeback": {
+            "producerCode": "12345678",
+            "lob": "PersonalAuto",
+            "baseState": "OH",
+            "quoteI": "9830661494",
+            "totalDrivers": 5,
+            "totalOrderedDrivers": 3,
+            "orderedDriversForCurrReq": 3,
+            "firstOrderDate": "01/22/2023",
+            "startDate": "01/22/2023",
+            "reportType": "CLUE",
+            "orderDate": "01/22/2023",
+            "orderTime": "05:50:21",
+            "quoteDate": "01/22/2023",
+            "quoteTime": "05:49:50",
+            "policyIssued": "False",
+            "policyIssueDate": "",
+            "policyIssueTime": "",
+            "policyNumber": "",
+            "shallOrderFlag": "True",
+            "driver": [
+              {
+                "firstName": "CATHERINE",
+                "DOB": "04/22/1979",
+                "lastName": "ANDERSON",
+                "licenseNumber": "OH242424",
+                "licenseType": "ActiveUS",
+                "violation": [
+                  {
+                    "occurrenceDate": "12/01/2021",
+                    "convictionDate": "",
+                    "incidentCategory": "MinorViolation"
+                  },
+                  {
+                    "occurrenceDate": "01/27/2021",
+                    "convictionDate": "02/08/2021",
+                    "incidentCategory": "MinorViolation"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "resource": "/saveChargeback",
+        "source": "APIGateway",
+        "correlation_id": "f1945ec5-ac18-4890-9130-ac5f10016436"
+      }
+}

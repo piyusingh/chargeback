@@ -27,7 +27,7 @@ def lambda_handler(event, context):
     logger.append_keys(orderYearMonth = f'{record_year}-{record_month:02d}', 
                     cycleCloseYearMonth = f'{cycle_close_year}-{cycle_close_month:02d}',
                     startDate = start_date, endDate = end_date)
-    output_key = f'{report_type}/transactions_report/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}/transactions_report.parquet'
+    output_key = f'chargeback_reports/intermediate_files/{report_type.lower()}/transactions_report/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}/transactions_report.parquet'
     
     response = transform_merged_parquet(report_type, record_year,record_month,cycle_close_month, cycle_close_year,output_key)
     logger.info(f'{lambda_name}:Successful Event')
@@ -40,7 +40,7 @@ def transform_merged_parquet(report_type, record_year,record_month,cycle_close_m
     temp_df = pd.DataFrame()
     temp_df2 = pd.DataFrame()
     try:
-        folder_key = f'{report_type}/final_csv_file/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}/csv_file.csv'
+        folder_key = f'chargeback_reports/intermediate_files/{report_type.lower()}/final_csv_file/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}/chargeback_data.csv'
         s3=boto3.client("s3")
         s3_object = s3.get_object(
             Bucket= bucket_name, 

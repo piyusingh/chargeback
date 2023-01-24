@@ -42,7 +42,7 @@ def parquet_to_csv(event):
         if full_df.empty == False:
             logger.info(f'{lambda_name} : parquet_to_csv, report csv file size : {full_df.shape}')
             full_df.to_csv(PARQUET_TEMP_FILENAME, header=True, index=False)
-            s3_resource.Bucket(OUTPUT_BUCKET).upload_file(PARQUET_TEMP_FILENAME, f'{report_type.upper()}/final_csv_file/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}/csv_file.csv')
+            s3_resource.Bucket(OUTPUT_BUCKET).upload_file(PARQUET_TEMP_FILENAME, f'chargeback_reports/intermediate_files/{report_type.lower()}/final_csv_file/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}/chargeback_data.csv')
             response = {
                 'statusCode': HTTPStatus.OK.value,
                 'response': 'Uploaded chargeback_monthly_report_csv successfully to S3'
@@ -92,9 +92,7 @@ def query_athena(report_type, record_year, record_month, start_date, end_date, c
             if state == "SUCCEEDED":
                 output_location=response["QueryExecution"]["ResultConfiguration"]["OutputLocation"]
                 data_df = pd.read_csv(output_location, dtype = {'pk':'str','producercode':'str','quoteid':'str','policynumber':'str'})
-                #date_cols = ['quotedate','issuancedate','orderdate','currenttimestamp','closedate','firstorderdate']
-                date_cols = ['quotedate','policyissuedate','orderdate','currenttimestamp','firstorderdate']
-
+                date_cols = ['quotedate','issuancedate','orderdate','currenttimestamp','closedate','firstorderdate']
                 date_cols.append('startdate')
                 data_df[date_cols] = data_df[date_cols].apply(pd.to_datetime)
                 logger.info(f'{lambda_name} : query_athena, athena query executed successfully, QueryExecutionId : {query_id}, data_df size: {data_df.shape}')

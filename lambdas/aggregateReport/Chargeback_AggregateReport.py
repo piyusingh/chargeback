@@ -34,7 +34,7 @@ def lambda_handler(event, context):
 def concatenate(report_type,start_date,end_date,record_year,record_month,cycle_close_year, cycle_close_month):
     response = ''
     try:
-        transaction_df = convert_to_df(f'{bucket_name}/{report_type}/transactions_report/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}')
+        transaction_df = convert_to_df(f'{bucket_name}/chargeback_reports/intermediate_files/{report_type.lower()}/transactions_report/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}')
         transaction_level_fields = ['baseState','producerCode','orderedDriversForCurrReq','QuoteId','costPerReport','quoteDate','policyNumber','policyIssueDate','waived']
 
         if transaction_df.empty == False:
@@ -47,7 +47,7 @@ def concatenate(report_type,start_date,end_date,record_year,record_month,cycle_c
                 
                 logger.info(f'{lambda_name} : concatenate, aggregated report {record_year}{record_month:02d} size : {final_aggregate_df.shape}')
                 
-                s3_resource.Bucket(bucket_name).upload_file(AGGREGATED_TEMP_FILENAME, f'{report_type}/aggregate_report/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}/aggregate_report.parquet')
+                s3_resource.Bucket(bucket_name).upload_file(AGGREGATED_TEMP_FILENAME, f'chargeback_reports/intermediate_files/{report_type.lower()}/aggregate_report/ingestion_yyyymm={cycle_close_year}{cycle_close_month:02d}/aggregate_report.parquet')
                 response = {
                         'statusCode': HTTPStatus.OK.value,
                         'response': 'Uploaded chargeback_aggregate_report successfully to S3'

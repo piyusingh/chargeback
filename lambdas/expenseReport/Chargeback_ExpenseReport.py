@@ -36,8 +36,8 @@ def lambda_handler(event, context):
         report_type = event['report_type']
         my_bucket = s3_resource.Bucket(bucket_name)
         file_ext = f"{event['record_year']}{event['record_month']:02d}_{event['start_date']}-{event['end_date']}"
-        [s3_object_list.append(object_summary.key) for object_summary in my_bucket.objects.filter(Prefix=f"{report_type}/transactions_report/ingestion_yyyymm={year}{month:02d}")]
-        [s3_object_list.append(object_summary.key) for object_summary in my_bucket.objects.filter(Prefix=f"{report_type}/aggregate_report/ingestion_yyyymm={year}{month:02d}")]
+        [s3_object_list.append(object_summary.key) for object_summary in my_bucket.objects.filter(Prefix=f"chargeback_reports/intermediate_files/{report_type.lower()}/transactions_report/ingestion_yyyymm={year}{month:02d}")]
+        [s3_object_list.append(object_summary.key) for object_summary in my_bucket.objects.filter(Prefix=f"chargeback_reports/intermediate_files/{report_type.lower()}/aggregate_report/ingestion_yyyymm={year}{month:02d}")]
         logger.info(f"lambda: {lambda_name}, lambda_handler(), Files are: {s3_object_list} in BucketName: {bucket_name}")
         for keys in s3_object_list:
             process_list.append(keys)
@@ -101,7 +101,7 @@ def create_report(report_type,df,year,month,rec_year,rec_month,bucket_name):
             response_list.append(response)
         
         final_response = {  "Total number of files generated":len(response_list),
-                            "BucketName": bucket_name,"CloseYear": year,"CloseMonth": month,"CallEDS":"N"}
+                            "BucketName": bucket_name,"CloseYear": year,"CloseMonth": month}
         logger.info(f'lambda: {lambda_name} , lambda_handler() final_response: {final_response}')
         return  {
             "Total number of files generated":len(response_list),
@@ -118,15 +118,6 @@ def create_report(report_type,df,year,month,rec_year,rec_month,bucket_name):
         return response
 def dataframe_structure(report_type, s3_resource,df_1,df_split,group,year,month,rec_year,rec_month, bucket_name):
 
-    cost = []
-    '''Calculate the costs for header details'''
-    temp_group = df_split.groupby('producerCode')
-    keys = temp_group.groups.keys()
-    for df_head, df_data in df_1.iterrows():
-        for key in keys:
-            if str(df_data['producerCode']) == str(key):
-                cost.append(float("{:.2f}".format(float(df_data['totalAmount']))))
-    mvr_cost = float("{:.2f}".format(sum(cost)))
     df_split['producerCode']= df_split['producerCode'].apply(lambda x: '{0:0>7}'.format(x))
     df_split['quoteId']= df_split['quoteId'].apply(lambda x: '{0:0>10}'.format(x))
     df_split = df_split[["baseState", "producerCode","orderedDriversForCurrReq",
@@ -137,58 +128,60 @@ def dataframe_structure(report_type, s3_resource,df_1,df_split,group,year,month,
     df_split.to_excel(writer,index = False, sheet_name = 'Expense_Report',startrow=7,freeze_panes=(8,0))
     workbook = writer.book
     worksheet = writer.sheets['Expense_Report']
-    format_excel_output(df_split,workbook,worksheet,mvr_cost)
+    format_excel_output(df_split,workbook,worksheet)
     writer.save()
     response = upload_excel_to_s3(report_type, s3_resource,"/tmp/Chargeback_ExpenseReport.xlsx",bucket_name,group,year,month,rec_year,rec_month)
     retry_count = 3  
     while retry_count > 0 and response["statusCode"] != 200:
         time.sleep(0.25)
-        response = upload_excel_to_s3(s3_resource,"/tmp/Chargeback_ExpenseReport.xlsx",bucket_name,group,year,month,rec_year,rec_month)
+        response = upload_excel_to_s3(report_type, s3_resource,"/tmp/Chargeback_ExpenseReport.xlsx",bucket_name,group,year,month,rec_year,rec_month)
         retry_count -= 1
     return response
 
-def format_excel_output(df_merge,workbook,worksheet,mvr_cost):
-    
-    """Change header names"""
-    df_merge.rename(columns={"baseState": "BaseState", "producerCode": "ProducerCode","orderedDriversForCurrReq":"DriversOrderedOn",
-                    "quoteId": "QuoteId", "reportType": "ReportType","costPerReport":"CostPerReport","quoteDate":"QuoteDate","policyNumber":"PolicyNumber",
-                    "policyIssueDate":"PolicyIssueDate","waived":"ChargeWaived",
-                    "bindRatio":"BindRatio","totalAmount":"TotalAmount"}, inplace=True)
-                   
-    '''cell format for colour in header'''
-    cell_format = workbook.add_format({'bold': True, 'bg_color': '#b6d7a8','border': 1 })
-    for col_num, value in enumerate(df_merge.columns.values):
-        worksheet.write(7, col_num, value, cell_format)
-        column_len = df_merge[value].astype(str).str.len().max()
-        column_len = max(column_len,len(value)) + 3
-        worksheet.set_column(col_num,col_num,column_len)
-    ''' formats for merged cells  '''  
-    merge_format = workbook.add_format({'align': 'left','valign':'top'})
-    row_format = workbook.add_format({'align': 'right','valign':'top'})
-    heading_format = workbook.add_format({'align': 'center','valign':'vcenter','bold': True,'border':1})
-    other_format = workbook.add_format({'align': 'left','valign':'vcenter','bold': False})
-    for agent_id in df_merge["ProducerCode"].unique():
-        index = df_merge.loc[df_merge["ProducerCode"]==agent_id].index.values + 1
-        df_merge['BindRatio'] = df_merge['BindRatio'].fillna('')
-        df_merge['ChargeWaived'] = df_merge['ChargeWaived'].fillna('')
-        if len(index) < 2:pass
-        else:
-            worksheet.merge_range(index[0]+7, 10, index[-1]+7, 10, df_merge.loc[index[0], 'BindRatio'], merge_format)
-            worksheet.merge_range(index[0]+7, 11, index[-1]+7, 11,df_merge.loc[index[0], 'TotalAmount'], row_format)
-            
-    '''Heading to the Sheet and other required additional data'''  
-    row_num = df_merge.index.values[-1] + 12
-    sheet_name = f"{df_merge['ReportType'].iloc[0]} Expense Report"
-    worksheet.merge_range('A2:G2', sheet_name, heading_format)
-    worksheet.merge_range('A3:G3', todays_date.strftime("%B, %Y"), heading_format)
-    worksheet.merge_range('A5:D5', 'Date Report Generated: '+ todays_date.strftime("%d-%b-%Y"), other_format)
-    worksheet.merge_range('A6:D6', f'Total Cost:  ${mvr_cost}', other_format)
-    
+def format_excel_output(df_merge,workbook,worksheet):
+    try:
+        """Change header names"""
+        df_merge.rename(columns={"baseState": "BaseState", "producerCode": "ProducerCode","orderedDriversForCurrReq":"DriversOrderedOn",
+                        "quoteId": "QuoteId", "reportType": "ReportType","costPerReport":"CostPerReport","quoteDate":"QuoteDate","policyNumber":"PolicyNumber",
+                        "policyIssueDate":"PolicyIssueDate","waived":"ChargeWaived",
+                        "bindRatio":"BindRatio","totalAmount":"TotalAmount"}, inplace=True)
+                       
+        '''cell format for colour in header'''
+        cell_format = workbook.add_format({'bold': True, 'bg_color': '#b6d7a8','border': 1 })
+        for col_num, value in enumerate(df_merge.columns.values):
+            worksheet.write(7, col_num, value, cell_format)
+            column_len = df_merge[value].astype(str).str.len().max()
+            column_len = max(column_len,len(value)) + 3
+            worksheet.set_column(col_num,col_num,column_len)
+        ''' formats for merged cells  '''  
+        merge_format = workbook.add_format({'align': 'left','valign':'top'})
+        row_format = workbook.add_format({'align': 'right','valign':'top'})
+        heading_format = workbook.add_format({'align': 'center','valign':'vcenter','bold': True,'border':1})
+        other_format = workbook.add_format({'align': 'left','valign':'vcenter','bold': False})
+        for agent_id in df_merge["ProducerCode"].unique():
+            index = df_merge.loc[df_merge["ProducerCode"]==agent_id].index.values + 1
+            df_merge['BindRatio'] = df_merge['BindRatio'].fillna('')
+            df_merge['ChargeWaived'] = df_merge['ChargeWaived'].fillna('')
+            if len(index) < 2:pass
+            else:
+                worksheet.merge_range(index[0]+7, 10, index[-1]+7, 10, df_merge.loc[index[0], 'BindRatio'], merge_format)
+                worksheet.merge_range(index[0]+7, 11, index[-1]+7, 11,df_merge.loc[index[0], 'TotalAmount'], row_format)
+                
+        '''Heading to the Sheet and other required additional data'''  
+        row_num = df_merge.index.values[-1] + 12
+        sheet_name = f"{df_merge['ReportType'].iloc[0]} Expense Report"
+        worksheet.merge_range('A2:G2', sheet_name, heading_format)
+        worksheet.merge_range('A3:G3', todays_date.strftime("%B, %Y"), heading_format)
+        worksheet.merge_range('A5:D5', 'Date Report Generated: '+ todays_date.strftime("%d-%b-%Y"), other_format)
+        worksheet.merge_range('A6:D6', f'Total Cost:  ${df_merge["TotalAmount"].iloc[0]}', other_format)
+    except Exception as ex:
+        logger.exception(f"lambda {lambda_name}: Format excel output failed with an exception {ex}")
+        
+        
 def upload_excel_to_s3(report_type, s3_resource, file_name, bucket, key, year, month,rec_year,rec_month):
-    
     try:
         s3_resource.Bucket(bucket).upload_file(file_name,
-                                               f'{report_type}/expense_report/ingestion_yyyymm={year}{month:02d}/expense_report.xlsx')
+                                               f'chargeback_reports/final_report/{report_type.lower()}/ingestion_yyyymm={year}{month:02d}/expense_report-{key}-{rec_year}-{rec_month:02d}.xlsx')
         return {'statusCode': HTTPStatus.OK.value,
                 'Key': key,
                 'Message': f'ExpenseReport-{key}-{rec_year}-{rec_month:02d}.xlsx has been successfully uploaded'}

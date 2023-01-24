@@ -5,3 +5,7 @@ aws_cdk.aws_glue_alpha
 ## test cases
 boto3
 aws-lambda-powertools
+moto
+mockito
+boto3
+pytz

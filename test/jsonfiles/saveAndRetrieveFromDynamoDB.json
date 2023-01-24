@@ -1,0 +1,26 @@
+{
+    "success_event_saveandretrievefromdynamodb_chargeback":
+    {
+            "quoteID": "9830661499",
+            "reportType": "MVR",
+            "resource": "/getChargeback",
+            "source": "APIGateway",
+            "correlation_id": "9e0a9c19-4b09-4d99-afed-28c2383b9a11"
+    },
+    "failure_event_saveandretrievefromdynamodb_chargeback":
+    {
+        "quoteID": "9830661492",
+        "reportType": "MVR",
+        "resource": "/getChargeback",
+        "source": "APIGateway",
+        "correlation_id": "9e0a9c19-4b09-4d99-afed-28c2383b9a11"
+},
+"failure_event_saveandretrievefromdynamodb_getchargeback":
+    {
+        "quoteID": "9830661492",
+        "reportType": "MVR",
+        "resource": "/getChargeback",
+        "source": "APIGateway",
+        "correlation_id": "9e0a9c19-4b09-4d99-afed-28c2383b9a11"
+}
+}

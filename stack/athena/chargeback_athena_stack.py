@@ -65,7 +65,7 @@ class ChargebackAthenaStack(cdk.Stack):
 					type=glue.Schema.DATE
 				),
 				glue.Column(
-					name="cycleCloseDate",
+					name="closedate",
 					type=glue.Schema.DATE
 				),
 				glue.Column(
@@ -171,7 +171,7 @@ class ChargebackAthenaStack(cdk.Stack):
 					type=glue.Schema.DATE
 				),
 				glue.Column(
-					name="cycleCloseDate",
+					name="closedate",
 					type=glue.Schema.DATE
 				),
 				glue.Column(

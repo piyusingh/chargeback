@@ -143,14 +143,14 @@ def log_event_details(event, context):
     try:
         quote_id = event['quoteID']
 
-        if event['resource'] == "/SaveChargeback":
+        if event['resource'] == "/saveChargeback":
             payload = event['payload']['chargeback']
             if 'producerCode' in payload:
                 producer_code = payload['producerCode']
-            if 'totalDriver' in payload:
-                total_driver = payload['totalDriver']
+            if 'totalDrivers' in payload:
+                total_drivers = payload['totalDrivers']
             else:
-                total_driver = 0
+                total_drivers = 0
             if 'totalOrderedDrivers' in payload:
                 total_ordered_drivers = payload['totalOrderedDrivers']
             else:
@@ -168,7 +168,7 @@ def log_event_details(event, context):
             loc_dt = datetime.datetime.now(eastern)
 
             logger.append_keys(x_correlation_id=event["correlation_id"], quoteID=quote_id, producerCode=producer_code,
-                               totalDrivers=total_driver, totalOrderedDrivers=total_ordered_drivers,
+                               totalDrivers=total_drivers, totalOrderedDrivers=total_ordered_drivers,
                                currentOrderedDrivers=current_ordered_drivers, state=base_state,
                                policyIssued=policy_issued, currentTimeStamp=loc_dt)
         
@@ -408,13 +408,10 @@ def get_charge(event, payload, transaction_response,audit_logger_table):
     current_time=str(loc_dt.strftime("%Y-%m-%d %H:%M:%S.%f"))
     try:
         if(payload['chargeback']['orderedDriversForCurrReq'] > 0 and payload['chargeback']['firstOrderDate']!= ''):
-            
             chargeback_cost = retrieve_cost(payload['chargeback']['baseState'], payload['chargeback']['reportType'])
-        
             total_charge = payload['chargeback']['orderedDriversForCurrReq'] * chargeback_cost
             per_report_charge = chargeback_cost
             logger.info(f'Total Charge : {total_charge}')
-
             if transaction_response['Count'] > 0:
                 if 'currentRequestCharge' in transaction_response['Items'][0]:
                     existing_charge = transaction_response['Items'][0]['totalCharge']
@@ -426,7 +423,7 @@ def get_charge(event, payload, transaction_response,audit_logger_table):
                 if 'totalCharge' in transaction_response['Items'][0]:
                     new_charge = transaction_response['Items'][0]['totalCharge']
                 if 'costPerReport' in transaction_response['Items'][0]:
-                    per_report_charge = transaction_response['Items'][0]['costPerRepor']
+                    per_report_charge = transaction_response['Items'][0]['costPerReport']
     except Exception as ex:
         logger.exception(f'Exception occurred while getting charge : {lambda_name} : {function_name} : Exception : {ex}')
     return status_code,total_charge,new_charge,per_report_charge
@@ -449,14 +446,6 @@ def retrieve_from_dynamo_db(quote_id, reportType, chargeback_table):
         response_payload = {
             "statusCode": 200,
             "body": payload
-        }
-        return response_payload
-    elif source == "APIGateway":
-        response_payload = {
-            "statusCode": 200,
-            "body": {
-                "message": "Data not available for the requested PK:" + quote_id
-            }
         }
         return response_payload
     else:
