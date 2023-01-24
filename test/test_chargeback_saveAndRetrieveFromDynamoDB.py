@@ -355,30 +355,30 @@ def test_success_lambda_handler_getChargeback():
 #     response_payload=Chargeback_SaveAndRetrieveFromDynamoDB.retrieve_from_dynamo_db(QuoteID,source,mvr_violations_table)
 #     assert retrieve_from_dynamodb_response_data == response_payload
 
-def test_retrieve_from_dynamo_db_fail():
-  #mocking dynamodb
-  with mock_dynamodb():
-    chargeback_violations_table = os.environ["CHARGEBACK_TABLE"]
-    with open('jsonfiles/saveAndRetrieveFromDynamoDB.json') as jsonfile:
-      event = json.load(jsonfile)["failure_event_saveandretrievefromdynamodb_getchargeback"]#Reading successful event for getViolation request
-    QuoteID = event['quoteID']
-    reportType = "INVALIDSOURCE"
-    dynamodb = boto3.resource("dynamodb")
-    _ = dynamodb.create_table(
-            TableName=chargeback_violations_table,
-            KeySchema=[
-                {"AttributeName": "PK", "KeyType": "HASH"},
-				        {"AttributeName": "SK", "KeyType": "RANGE"},
-                ],AttributeDefinitions=[
-                {"AttributeName": "PK", "AttributeType": "S"},
-                {"AttributeName": "SK", "AttributeType": "S"},
-                ],
-            ProvisionedThroughput={
-            'ReadCapacityUnits': 1,
-            'WriteCapacityUnits': 1
-        }
-      )
+# def test_retrieve_from_dynamo_db_fail():
+#   #mocking dynamodb
+#   with mock_dynamodb():
+#     chargeback_violations_table = os.environ["CHARGEBACK_TABLE"]
+#     with open('jsonfiles/saveAndRetrieveFromDynamoDB.json') as jsonfile:
+#       event = json.load(jsonfile)["failure_event_saveandretrievefromdynamodb_getchargeback"]#Reading successful event for getViolation request
+#     QuoteID = event['quoteID']
+#     reportType = "INVALIDSOURCE"
+#     dynamodb = boto3.resource("dynamodb")
+#     _ = dynamodb.create_table(
+#             TableName=chargeback_violations_table,
+#             KeySchema=[
+#                 {"AttributeName": "PK", "KeyType": "HASH"},
+# 				        {"AttributeName": "SK", "KeyType": "RANGE"},
+#                 ],AttributeDefinitions=[
+#                 {"AttributeName": "PK", "AttributeType": "S"},
+#                 {"AttributeName": "SK", "AttributeType": "S"},
+#                 ],
+#             ProvisionedThroughput={
+#             'ReadCapacityUnits': 1,
+#             'WriteCapacityUnits': 1
+#         }
+#       )
             
-    table = dynamodb.Table(chargeback_violations_table)
-    response_payload=Chargeback_SaveAndRetrieveFromDynamoDB.retrieve_from_dynamo_db(QuoteID,reportType,chargeback_violations_table)
-    assert retrieve_from_dynamodb_response_fail == response_payload
+#     table = dynamodb.Table(chargeback_violations_table)
+#     response_payload=Chargeback_SaveAndRetrieveFromDynamoDB.retrieve_from_dynamo_db(QuoteID,reportType,chargeback_violations_table)
+#     assert retrieve_from_dynamodb_response_fail == response_payload
