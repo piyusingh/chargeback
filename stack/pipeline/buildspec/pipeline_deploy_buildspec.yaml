@@ -16,7 +16,7 @@ phases:
       - npx cdk deploy ChargebackPipelineStack/development/TriggerStateMachineLambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/PrepareDataRetrieveFromDynamoDBLambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/PrepareDataSaveToDynamoDBLambdaStack --require-approval never
-       - npx cdk deploy ChargebackPipelineStack/development/BindRatioLambdaStack --require-approval never
+      - npx cdk deploy ChargebackPipelineStack/development/BindRatioLambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/SaveAndRetrieveFromDynamoDBLambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ReportCSVLambdaStack --require-approval never
       - npx cdk deploy ChargebackPipelineStack/development/ReportTriggerStateMachineLambdaStack --require-approval never
