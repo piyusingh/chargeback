@@ -1,0 +1,2 @@
+producercode,lob,basestate,quoteid,chargebackamount,totaldrivers,totalordereddrivers,ordereddriversforcurrreq,costperreport,firstorderdate,closedate,currenttimestamp,startdate,reporttype,orderdate,quotedate,policyissued,policyissuedate,policynumber,correlationid,shallorderflag,totalcharge,ingestion_yyyymmdd
+87654321,PersonalAuto,OH,0987654123,10.0,3,2,2,5.0,2023-01-22,2023-03-31,2023-01-25 06:17:40.808,2023-01-22,MVR,2023-01-22 05:50:21,2023-01-22 05:49:50,False,,,7db2c4a2-e532-4008-810f-fb7e86710020,True,10.0,20230125

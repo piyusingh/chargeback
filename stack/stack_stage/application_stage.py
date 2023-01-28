@@ -21,6 +21,7 @@ from stack.lambda_functions.aggregateReport_lambda_stack import AggregateReportL
 from stack.lambda_functions.transactionReport_lambda_stack import TransactionReportLambdaStack
 from stack.lambda_functions.reportTriggerStateMachine_lambda_stack import ReportTriggerStateMachineLambdaStack
 from stack.lambda_functions.expenseReport_lambda_stack import ExpenseReportLambdaStack
+from stack.lambda_functions.bindRatio_lambda_stack import BindRatioLambdaStack
 from stack.step_functions.chargeback_report_step_functions_stack import ChargebackReportStepFunctionsStack
 from stack.s3.chargeback_s3_stack import ChargebackS3Stack
 from stack.step_functions.chargeback_step_functions_stack import ChargebackStepFunctionsStack
@@ -39,6 +40,7 @@ class ChargebackStacks(cdk.Stage):
     preparedatasavetodynamodb_lambda_stack = PrepareDataSaveToDynamoDBLambdaStack( self,'PrepareDataSaveToDynamoDBLambdaStack',common_stack,raw_config=raw_config)
     preparedataretrievefromdynamodb_lambda_stack = PrepareDataRetrieveFromDynamoDBLambdaStack( self,'PrepareDataRetrieveFromDynamoDBLambdaStack',common_stack,raw_config=raw_config)
     savesndretrievefromdynamodb_lambda_stack = SaveAndRetrieveFromDynamoDBLambdaStack( self,'SaveAndRetrieveFromDynamoDBLambdaStack',common_stack,raw_config=raw_config)
+    bindratio_lambda_stack = BindRatioLambdaStack( self,'BindRatioLambdaStack',common_stack,raw_config=raw_config)
     streamdatatos3_lambda_stack = StreamDataToS3LambdaStack( self,'StreamDataToS3LambdaStack',common_stack,raw_config=raw_config)
     readingfromdynamodbstreams_lambda_stack = ReadingFromDynamoDBStreamsLambdaStack( self,'ReadingFromDynamoDBStreamsLambdaStack',common_stack,raw_config=raw_config)
     readingfromkinesis_lambda_stack = ReadingFromKinesisLambdaStack( self,'ReadingFromKinesisLambdaStack',common_stack,raw_config=raw_config)

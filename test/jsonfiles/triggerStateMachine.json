@@ -1,0 +1,30 @@
+{
+	"getChargeBackEvent": {
+		"body":"{\"quoteID\":\"002433131\",\"reportType\":\"MVR\"}",
+		"resource": "/getChargeback",
+		"headers": {
+			"x-forwarded-for": "8.26.58.9, 70.132.33.131",
+			"accept-encoding": "gzip, deflate, br",
+			"cloudfront-is-tablet-viewer": "false",
+			"cloudfront-viewer-country": "US",
+			"x-amzn-requestid": "eb47b513-6d77-4aa2-bea0-9d49bc5097be",
+			"via": "1.1 99baebf4b5bb631267dcfa82456151cc.cloudfront.net (CloudFront)",
+			"postman-token": "0208d77f-65d0-4c03-8a61-6e6718a9f1f4",
+			"x-api-key": "da2-dejouqo3wnh2rev63sd5khk2se",
+			"cloudfront-forwarded-proto": "https",
+			"content-type": "application/json",
+			"x-amzn-trace-id": "Root=1-6114d2a6-2de9b8436463c95e6c20f6ca",
+			"x-amz-cf-id": "Hiyta1mHpe4Mz3ujjosZRtuARyrSDFiaSpfOvBX42VHq_k_If6eBFw==",
+			"content-length": "796",
+			"x-forwarded-proto": "https",
+			"host": "4iwgcahy3nfcdfzxqkctu4ej7y.appsync-api.us-east-1.amazonaws.com",
+			"user-agent": "PostmanRuntime/7.28.1",
+			"cloudfront-is-desktop-viewer": "true",
+			"accept": "*/*",
+			"cloudfront-is-mobile-viewer": "false",
+			"x-forwarded-port": "443",
+			"cloudfront-is-smarttv-viewer": "false"
+		},
+		"source": "ApiGateway"
+	}
+}

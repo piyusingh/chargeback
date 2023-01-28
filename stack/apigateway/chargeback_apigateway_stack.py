@@ -24,6 +24,10 @@ class ChargebackApigatewayStack(cdk.Stack):
         import_reporttrigger_lambda_arn = cdk.Fn.import_value(shared_value_to_import="Chargeback-reportTriggerStateMachine-export")      
         reportTriggerStateMachine=lambda_.Function.from_function_arn(self,"Chargeback_ReportTriggerStateMachine_Import",
                                                                 function_arn = import_reporttrigger_lambda_arn)
+        ## Importing bind Ratio
+        import_bindratio_lambda_arn = cdk.Fn.import_value(shared_value_to_import="Chargeback-bindRatio-export")      
+        bindRatio=lambda_.Function.from_function_arn(self,"Chargeback_BindRatio_Import",
+                                                                function_arn = import_bindratio_lambda_arn)
         self.target_api = apigw.RestApi(self,'Chargeback',
                                         rest_api_name='Chargeback',
                                         endpoint_types=[apigw.EndpointType.REGIONAL],
@@ -330,7 +334,30 @@ class ChargebackApigatewayStack(cdk.Stack):
                             request_validator= ReqValidator,
                             api_key_required=True
                             )
-
+        #Create a resource named "getBindRatio" on the base API
+        getBindRatio = self.target_api.root.add_resource('getBindRatio')
+        # Create API Integration for getBindRatio
+        getBindRatio_lambda_integration = apigw.LambdaIntegration(bindRatio,proxy=True, integration_responses=
+                                                     [
+                                                         {
+                                                             'statusCode': '200',
+                                                         }
+                                                     ]
+                                                    )
+        method_getBindRatio = getBindRatio.add_method('GET', getBindRatio_lambda_integration,
+                            request_parameters={
+                                        'method.request.querystring.ordermonth':True,
+                                        'method.request.querystring.orderyear':True,
+                                        'method.request.querystring.producercode':True,
+                                        'method.request.querystring.reporttype':True},
+                            method_responses= [
+                                {
+                                    'statusCode': '200'
+                                }
+                            ],
+                            request_validator= ReqValidator,
+                            api_key_required=True
+                            )
         ##Adding lambda resource polices
         trigger_lambda_getChargeback_resource_policy = lambda_.CfnPermission(self,
 										"trigger_lambda_getChargeback_resource_policy",
@@ -357,4 +384,13 @@ class ChargebackApigatewayStack(cdk.Stack):
                                         function_name = reportTriggerStateMachine.function_name,
 										source_arn  = self.target_api.arn_for_execute_api(method = "GET",
 																						path = "/getReport",
+																						stage = self.target_api.deployment_stage.stage_name))
+        
+        trigger_lambda_getBindRatio_resource_policy = lambda_.CfnPermission(self,
+										"trigger_lambda_getBindRatio_resource_policy",
+										principal = "apigateway.amazonaws.com",
+										action = "lambda:InvokeFunction",
+                                        function_name = bindRatio.function_name,
+										source_arn  = self.target_api.arn_for_execute_api(method = "GET",
+																						path = "/getBindRatio",
 																						stage = self.target_api.deployment_stage.stage_name))

@@ -43,6 +43,11 @@
 			"STREAM_NAME": "ChargeBackStream",
 			"AUDIT_LOGGER_TABLE": "Chargeback-Audit"
 		},
+		"bindRatio_lambda_vars": {
+			"LOG_LEVEL": "INFO",
+			"SERVICE": "Chargeback-bindRatio",
+			"CHARGEBACK_TABLE": "Chargeback"
+		},
 		"readingFromKinesis_lambda_vars": {
 			"LOG_LEVEL": "INFO",
 			"SERVICE": "Chargeback-ReadingFromKinesis",
@@ -88,7 +93,7 @@
 			"STATE_MACHINE_ARN": "arn:aws:states:us-east-1:187879053795:stateMachine:ChargebackReportStateMachine"
 		},
 		"aggregateReport_lambda_vars": {
-			"SERVICE": "Chargeback-ReportCSV",
+			"SERVICE": "Chargeback-AggregateReport",
 			"S3_BUCKET": "chargebackinsurance",
 			"AMOUNT_CRITERIA": "50"
 		}

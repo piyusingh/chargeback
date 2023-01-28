@@ -1,0 +1,31 @@
+{
+    "success_event": {
+        "report_type": "MVR",
+        "record_year": 2023,
+        "record_month": 1,
+        "cycle_close_year": 2023,
+        "cycle_close_month": 3,
+        "start_date": "20230101",
+        "end_date": "20230131"
+      },
+    "fail_event" :
+    {
+        "record_year": 2023,
+        "record_month": 1,
+        "cycle_close_year": 2023,
+        "cycle_close_month": 3,
+        "start_date": "20230101",
+        "end_date": "20230131"
+      },
+      "fail_event_1" :
+    {
+        "record_year": 2023,
+        "record_month": 1,
+        "cycle_close_year": 2023,
+        "cycle_close_month": 3,
+        "start_date": "20230101",
+        "end_date": "20230131",
+        "report_type": ""
+      }
+
+ }

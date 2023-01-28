@@ -59,7 +59,7 @@ def concatenate(report_type,start_date,end_date,record_year,record_month,cycle_c
                 "response": "Oops, something went wrong ! Please reach out to the technical team for assistance."
                 }
         else:
-            logger.info(f'{lambda_name} : aggregate parquet file is missing')
+            logger.info(f'{lambda_name} : Transaction parquet file is missing')
             response = {
             "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR.value,
             "response": "Oops, something went wrong ! Please reach out to the technical team for assistance."

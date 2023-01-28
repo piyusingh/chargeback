@@ -3,16 +3,13 @@ import boto3
 from aws_lambda_powertools import Logger
 import os
 from http import HTTPStatus
-import s3fs
 import datetime
 from dateutil.relativedelta import relativedelta
 from datetime import date, timedelta, datetime
-
-lambda_name = os.environ['SERVICE']
-logger = Logger(service=lambda_name)
-
-
+client = boto3.client('stepfunctions')
 def lambda_handler(event, context):
+    lambda_name = os.environ['SERVICE']
+    logger = Logger(service=lambda_name)
     response = ''
     query_parameters = ['start_date','end_date','report_type']
     try:
@@ -25,8 +22,6 @@ def lambda_handler(event, context):
                     event_data[param] = queryStringParameters[param]
         
         logger.info(f'{lambda_name}, event_data : {event_data}')
-        
-        client = boto3.client('stepfunctions')
         
         start = datetime.strptime(event_data['start_date'], '%Y%m%d')
         end = datetime.strptime(event_data['end_date'], '%Y%m%d')
@@ -50,11 +45,8 @@ def lambda_handler(event, context):
             }
         }
         logger.info(f'{lambda_name} input payload to state machine : {payload} ')
-
-        step_function_response = client.start_execution(
-            stateMachineArn = os.environ['STATE_MACHINE_ARN'],
-            input = json.dumps(payload)
-        )
+        step_function_response=trigger_stepfunction(os.environ['STATE_MACHINE_ARN'],payload)
+        
         response = {
             "statusCode":step_function_response['ResponseMetadata']['HTTPStatusCode'],
             "body": json.dumps({
@@ -74,3 +66,10 @@ def lambda_handler(event, context):
             })
         }
     return response
+
+def trigger_stepfunction(arn,payload):
+    step_function_response = client.start_execution(
+            stateMachineArn = arn,
+            input = json.dumps(payload)
+        )
+    return step_function_response

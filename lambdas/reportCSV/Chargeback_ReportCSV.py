@@ -1,7 +1,5 @@
-import s3fs
 import boto3
 import datetime
-import fastparquet as fp
 import pandas as pd
 import os
 from aws_lambda_powertools import Logger
@@ -92,7 +90,7 @@ def query_athena(report_type, record_year, record_month, start_date, end_date, c
             if state == "SUCCEEDED":
                 output_location=response["QueryExecution"]["ResultConfiguration"]["OutputLocation"]
                 data_df = pd.read_csv(output_location, dtype = {'pk':'str','producercode':'str','quoteid':'str','policynumber':'str'})
-                date_cols = ['quotedate','issuancedate','orderdate','currenttimestamp','closedate','firstorderdate']
+                date_cols = ['quotedate','policyissuedate','orderdate','currenttimestamp','closedate','firstorderdate']
                 date_cols.append('startdate')
                 data_df[date_cols] = data_df[date_cols].apply(pd.to_datetime)
                 logger.info(f'{lambda_name} : query_athena, athena query executed successfully, QueryExecutionId : {query_id}, data_df size: {data_df.shape}')

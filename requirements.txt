@@ -9,3 +9,7 @@ moto
 mockito
 boto3
 pytz
+pandas
+fastparquet
+mock
+s3fs
