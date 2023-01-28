@@ -13,3 +13,4 @@ pandas
 fastparquet
 mock
 s3fs
+botocore
