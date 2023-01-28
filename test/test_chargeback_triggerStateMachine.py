@@ -76,7 +76,7 @@ def test_success_lambda_handler():
             when(Chargeback_TriggerStateMachine).invoke_state_machine(ANY, ANY).thenReturn(invoke_state_machine_response)
             when(Chargeback_TriggerStateMachine).describe_state_machine_execution(ANY).thenReturn(describeStateMachineExecutin_response)
             context=Context()
-            with open('jsonFiles/triggerStateMachine.json') as jsonfile:
+            with open('jsonfiles/triggerStateMachine.json') as jsonfile:
                 event=json.load(jsonfile)["getChargeBackEvent"]
             response=Chargeback_TriggerStateMachine.lambda_handler(event, context)
             assert response == lambda_handler_getChargeback_success_response
