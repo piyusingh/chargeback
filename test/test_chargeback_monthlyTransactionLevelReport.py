@@ -77,7 +77,7 @@ def s3_resource(aws_credentials):
 def s3_bucket(s3_client, s3_resource):
     s3_bucket=s3_client.create_bucket(Bucket=bucket_name)
     with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                           'csvFiles/chargeback_data.csv'), 'rb') as data:
+                           'csvfiles/chargeback_data.csv'), 'rb') as data:
         s3_client.upload_fileobj(data, bucket_name, key)
     yield 
 
@@ -100,7 +100,7 @@ class Bucket():
 def test_success_lambda_handler(mock_bucket,s3_client, s3_bucket, s3_resource,monkeypatch):
     monkeypatch.setenv('S3_BUCKET', "chargebackinsurance")
     s3_client.create_bucket(Bucket="chargebackinsurance")
-    with open('csvFiles/chargeback_data.csv','rb') as data:
+    with open('csvfiles/chargeback_data.csv','rb') as data:
         s3_client.upload_fileobj(data,"chargebackinsurance",key)
     with open('jsonfiles/monthlyReportCsv.json') as jsonfile:
         event=json.load(jsonfile)["success_event"]      #Reading successful event from json file

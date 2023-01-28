@@ -98,7 +98,7 @@ class Athena_Client():
 
 def test_success_query_athena():
     #Creating expected response
-    output_location="./csvFiles/chargeback_data.csv"
+    output_location="./csvfiles/chargeback_data.csv"
     data_df = pd.read_csv(output_location, dtype = {'pk':'str','producercode':'str','quoteid':'str','policynumber':'str'})
     date_cols = ['quotedate','policyissuedate','orderdate','currenttimestamp','closedate','firstorderdate']
     date_cols.append('startdate')
@@ -132,7 +132,7 @@ class Athena_Client_Exception():
 
 def test_exception_query_athena():
     #Creating expected response
-    output_location="./csvFiles/chargeback_data.csv"
+    output_location="./csvfiles/chargeback_data.csv"
     data_df = pd.read_csv(output_location, dtype = {'pk':'str','producercode':'str','quoteid':'str','policynumber':'str'})
     date_cols = ['quotedate','policyissuedate','orderdate','currenttimestamp','closedate','firstorderdate']
     date_cols.append('startdate')
